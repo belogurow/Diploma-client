@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Social network client</string>
+
+    <!-- Login activity -->
+    <string name="login_hint">Login</string>
+    <string name="password_hint">Password</string>
+    <string name="login_button">Log in</string>
+    <string name="sign_up_button">Sign up</string>
+
+    <!-- Common -->
+    <string name="empty_field">Empty filed</string>
 </resources>
