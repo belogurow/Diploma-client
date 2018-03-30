@@ -13,10 +13,10 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import ru.belogurow.socialnetworkclient.R;
-import ru.belogurow.socialnetworkclient.model.User;
-import ru.belogurow.socialnetworkclient.model.UserMessage;
-import ru.belogurow.socialnetworkclient.model.UserStatus;
-import ru.belogurow.socialnetworkclient.viewModel.UserViewModel;
+import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
+import ru.belogurow.socialnetworkclient.common.web.Resource;
+import ru.belogurow.socialnetworkclient.users.model.User;
+import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 
 public class LoginActivity extends AppCompatActivity {
     private UserViewModel mUserViewModel;
@@ -34,13 +34,13 @@ public class LoginActivity extends AppCompatActivity {
 
         initFields();
 
-        Observer<UserMessage> loginObserver = userMessage -> {
-            if (userMessage != null && userMessage.getUser() != null && userMessage.getMessage() != null) {
-                Toast.makeText(this, userMessage.getUser().toString(), Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, userMessage.getMessage(), Toast.LENGTH_SHORT).show();
-            }
 
+        Observer<Resource<User>> loginObserver = user -> {
+            if (user != null && user.status == NetworkStatus.SUCCESS) {
+                Toast.makeText(this, user.data.toString(), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, user.message, Toast.LENGTH_SHORT).show();
+            }
             mProgressBarLogin.setVisibility(View.GONE);
         };
 
@@ -55,7 +55,6 @@ public class LoginActivity extends AppCompatActivity {
                     User newUser = new User();
                     newUser.setUsername(mTextInputUsername.getEditText().getText().toString());
                     newUser.setPassword(mTextInputPassword.getEditText().getText().toString());
-                    newUser.setUserStatus(UserStatus.OFFLINE);
 
                     mUserViewModel.login(newUser).observe((LifecycleOwner) v.getContext(), loginObserver);
 
