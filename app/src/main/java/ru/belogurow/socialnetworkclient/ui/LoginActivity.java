@@ -36,11 +36,19 @@ public class LoginActivity extends AppCompatActivity {
 
 
         Observer<Resource<User>> loginObserver = user -> {
-            if (user != null && user.status == NetworkStatus.SUCCESS) {
-                Toast.makeText(this, user.data.toString(), Toast.LENGTH_SHORT).show();
+            if (user != null) {
+                if (user.data != null && user.status == NetworkStatus.SUCCESS) {
+                    Toast.makeText(this, user.data.toString(), Toast.LENGTH_LONG).show();
+                }
+
+                if (user.message != null && user.status == NetworkStatus.ERROR) {
+                    Toast.makeText(this, user.message, Toast.LENGTH_LONG).show();
+                }
             } else {
-                Toast.makeText(this, user.message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Client error", Toast.LENGTH_LONG).show();
             }
+
+
             mProgressBarLogin.setVisibility(View.GONE);
         };
 
@@ -57,8 +65,6 @@ public class LoginActivity extends AppCompatActivity {
                     newUser.setPassword(mTextInputPassword.getEditText().getText().toString());
 
                     mUserViewModel.login(newUser).observe((LifecycleOwner) v.getContext(), loginObserver);
-
-//                    Toast.makeText(getApplicationContext(), "Щас будит мясо", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -69,17 +75,6 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Не реализовано", Toast.LENGTH_SHORT).show();
             }
         });
-
-
-
-//        mUserViewModel.getUsers().observe(this, new Observer<List<User>>() {
-//            @Override
-//            public void onChanged(@Nullable List<User> users) {
-//                if (users != null) {
-//                    Log.d(LoginActivity.class.getSimpleName() + "2", users.toString());
-//                }
-//            }
-//        });
     }
 
     private void initFields() {

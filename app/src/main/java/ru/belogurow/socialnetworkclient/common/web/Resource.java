@@ -3,6 +3,9 @@ package ru.belogurow.socialnetworkclient.common.web;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 
 import okhttp3.ResponseBody;
@@ -26,13 +29,22 @@ public class Resource<T> {
         return new Resource<>(SUCCESS, data, null);
     }
 
-    public static <T> Resource<T> error(@NonNull ResponseBody msg) {
+    public static <T> Resource<T> error(@NonNull ResponseBody errorBody) {
         try {
-            return new Resource<>(ERROR, null, msg.string());
-        } catch (IOException e) {
+            JSONObject object = new JSONObject(errorBody.string());
+            return new Resource<>(ERROR, null, object.getString("message"));
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
-            return new Resource<>(ERROR, null, "Server error. See logs.");
+            return Resource.error();
         }
+    }
+
+    public static <T> Resource<T> error(@NonNull String message) {
+        return new Resource<>(ERROR, null, message);
+    }
+
+    public static <T> Resource<T> error() {
+        return new Resource<>(ERROR, null, "Api error. See logs.");
     }
 
 }

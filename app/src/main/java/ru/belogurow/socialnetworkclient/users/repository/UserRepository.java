@@ -7,20 +7,17 @@ import android.util.Log;
 
 import java.util.List;
 
-import javax.inject.Singleton;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import ru.belogurow.socialnetworkclient.common.App;
 import ru.belogurow.socialnetworkclient.common.web.Resource;
 import ru.belogurow.socialnetworkclient.users.model.User;
-import ru.belogurow.socialnetworkclient.web.ControllerWebUserService;
 
 /**
  * Created by alexbelogurow on 26.03.2018.
  */
 
-@Singleton
 public class UserRepository {
 
     private static final String TAG = UserRepository.class.getSimpleName();
@@ -34,22 +31,24 @@ public class UserRepository {
 
         // TODO: 30.03.2018 GET FROM DB, IF IT IS EMPTY -> call to server
         final MutableLiveData<Resource<User>> userData = new MutableLiveData<>();
-//        userData.postValue(Resource.loading(null));
 
-        ControllerWebUserService.getWebUserService().login(user).enqueue(new Callback<User>() {
+        App.sWebUserService.login(user).enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    Log.d(TAG, "onResponse: " + response.body());
                     userData.postValue(Resource.success(response.body()));
-                } else {
+
+                } else if (response.errorBody() != null) {
+                    Log.d(TAG, "onResponse: " + response.errorBody());
                     userData.postValue(Resource.error(response.errorBody()));
-                    Log.d(TAG, "onResponse: " + response);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                 Log.d(TAG, "onFailure: " + t.getLocalizedMessage());
+                userData.postValue(Resource.error(t.getLocalizedMessage()));
             }
         });
 
@@ -59,7 +58,7 @@ public class UserRepository {
 //    public LiveData<User> getUser(UUID id) {
 //        final MutableLiveData<User> userData = new MutableLiveData<>();
 //
-//        ControllerWebUserService.getWebUserService().getUser(id).enqueue(new Callback<User>() {
+//        WebService.getWebUserService().getUser(id).enqueue(new Callback<User>() {
 //            @Override
 //            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
 //                if (response.isSuccessful()) {
@@ -84,7 +83,7 @@ public class UserRepository {
 //        final int CREATED = 201;
 //        final int UNPROCESSABLE_ENTITY = 422;
 //
-//        ControllerWebUserService.getWebUserService().login(user).enqueue(new Callback<User>() {
+//        WebService.getWebUserService().login(user).enqueue(new Callback<User>() {
 //            @Override
 //            public void onResponse(Call<User> call, Response<User> response) {
 //                switch (user.getUserStatus()) {
@@ -123,7 +122,7 @@ public class UserRepository {
     public LiveData<List<User>> getUsers() {
         final MutableLiveData<List<User>> usersData = new MutableLiveData<>();
 
-        ControllerWebUserService.getWebUserService().getUsers().enqueue(new Callback<List<User>>() {
+        App.sWebUserService.getUsers().enqueue(new Callback<List<User>>() {
             @Override
             public void onResponse(@NonNull Call<List<User>> call, @NonNull Response<List<User>> response) {
                 Log.d(UserRepository.class.getSimpleName(), call.request().toString());

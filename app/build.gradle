@@ -17,6 +17,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+//    defaultConfig {
+//
+//        // Enabling multidex support.
+//        multiDexEnabled true
+//    }
+//    dexOptions {
+//        javaMaxHeapSize "4g"
+//    }
     dataBinding {
         enabled = true
     }
@@ -52,9 +60,9 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:' + rootProject.apacheCommons
 
     // Dagger
-    implementation 'com.google.dagger:dagger-android:' + rootProject.daggerVersion
-    implementation 'com.google.dagger:dagger-android-support:' + rootProject.daggerVersion // if you use the support libraries
-    annotationProcessor 'com.google.dagger:dagger-android-processor:' + rootProject.daggerVersion
+//    compile'com.google.dagger:dagger-android:' + rootProject.daggerVersion
+//    compile'com.google.dagger:dagger-android-support:' + rootProject.daggerVersion // if you use the support libraries
+//    annotationProcessor 'com.google.dagger:dagger-android-processor:' + rootProject.daggerVersion
 
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:' + rootProject.retrofitVersion
