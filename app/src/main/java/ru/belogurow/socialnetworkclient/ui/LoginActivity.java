@@ -58,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void initFields() {
         mButtonLogin = findViewById(R.id.login_button);
-        mButtonSignUp = findViewById(R.id.signup_button);
+        mButtonSignUp = findViewById(R.id.login_to_signup_button);
         mTextInputUsername = findViewById(R.id.login_textinput);
         mTextInputPassword = findViewById(R.id.password_textinput);
         mProgressBarLogin = findViewById(R.id.progressBar_login);
@@ -77,11 +77,15 @@ public class LoginActivity extends AppCompatActivity {
 
             switch (userResource.status) {
                 case SUCCESS:
-                    Toast.makeText(this, userResource.data.toString(), Toast.LENGTH_LONG).show();
+//                    Toast.makeText(this, userResource.data.toString(), Toast.LENGTH_LONG).show();
+                    finish();
+                    startActivity(new Intent(this, MainActivity.class));
                     break;
                 case ERROR:
                     Toast.makeText(this, userResource.message, Toast.LENGTH_LONG).show();
                     break;
+                default:
+                    Toast.makeText(this, "Unknown status", Toast.LENGTH_LONG).show();
             }
 
             mProgressBarLogin.setVisibility(View.GONE);

@@ -30,6 +30,10 @@ public class UserViewModel extends ViewModel {
           return mUserRepository.login(user);
     }
 
+    public LiveData<Resource<User>> registration(User user) {
+        return mUserRepository.registration(user);
+    }
+
     public LiveData<List<User>> getUsers() {
         return mUserRepository.getUsers();
     }

@@ -24,8 +24,32 @@ public class UserRepository {
 
     private static final String TAG = UserRepository.class.getSimpleName();
 
-    public LiveData<User> registration(User user) {
-        return null;
+    public LiveData<Resource<User>> registration(User user) {
+        Log.d(TAG, "registration: " + user.toString());
+
+        // TODO: 04.04.2018 SAVE TO DB IF SUCCESS
+        final MutableLiveData<Resource<User>> userData = new MutableLiveData<>();
+        App.sWebUserService.registration(user).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d(TAG, "onResponse: " + response.body());
+                    userData.postValue(Resource.success(response.body()));
+
+                }  else if (response.errorBody() != null) {
+                Log.d(TAG, "onResponse: " + response.errorBody());
+                userData.postValue(Resource.error(response.errorBody()));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
+                Log.d(TAG, "onFailure: " + t.getLocalizedMessage());
+                userData.postValue(Resource.error(t.getLocalizedMessage()));
+            }
+        });
+
+        return userData;
     }
 
     public LiveData<Resource<User>> login(User user) {
