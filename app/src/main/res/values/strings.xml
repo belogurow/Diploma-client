@@ -9,4 +9,10 @@
 
     <!-- Common -->
     <string name="empty_field">Empty filed</string>
+
+    <!-- SignUp Activity-->
+    <string name="login_signup">Login</string>
+    <string name="fullname_signup">Fullname</string>
+    <string name="password">Password</string>
+    <string name="singup_button">Sing up</string>
 </resources>

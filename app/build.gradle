@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 27
@@ -38,6 +39,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:' + rootProject.espressoVersion, {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -60,16 +62,27 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:' + rootProject.apacheCommons
 
     // Dagger
-//    compile'com.google.dagger:dagger-android:' + rootProject.daggerVersion
-//    compile'com.google.dagger:dagger-android-support:' + rootProject.daggerVersion // if you use the support libraries
-//    annotationProcessor 'com.google.dagger:dagger-android-processor:' + rootProject.daggerVersion
+    implementation 'com.google.dagger:dagger:' + rootProject.daggerVersion
+    annotationProcessor 'com.google.dagger:dagger-compiler:' + rootProject.daggerVersion
+    implementation 'com.google.dagger:dagger-android:' + rootProject.daggerVersion
+    implementation 'com.google.dagger:dagger-android-support:' + rootProject.daggerVersion
+    // if you use the support libraries
+    annotationProcessor 'com.google.dagger:dagger-android-processor:' + rootProject.daggerVersion
 
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:' + rootProject.retrofitVersion
     implementation 'com.squareup.retrofit2:converter-gson:' + rootProject.retrofitVersion
 
+    // ReactiveX
+//    implementation "io.reactivex.rxjava2:rxjava:$project.rxJavaVersion"
+//    implementation "io.reactivex.rxjava2:rxandroid:$project.rxAndroidVersion"
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
+}
+repositories {
+    mavenCentral()
 }

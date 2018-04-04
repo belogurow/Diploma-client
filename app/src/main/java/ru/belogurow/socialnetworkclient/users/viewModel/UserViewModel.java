@@ -5,6 +5,9 @@ import android.arch.lifecycle.ViewModel;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import ru.belogurow.socialnetworkclient.App;
 import ru.belogurow.socialnetworkclient.common.web.Resource;
 import ru.belogurow.socialnetworkclient.users.model.User;
 import ru.belogurow.socialnetworkclient.users.repository.UserRepository;
@@ -15,19 +18,16 @@ import ru.belogurow.socialnetworkclient.users.repository.UserRepository;
 
 public class UserViewModel extends ViewModel {
 
-    private UserRepository mUserRepository;
+    @Inject
+    protected UserRepository mUserRepository;
     private LiveData<Resource<User>> liveDataUser;
 
     public UserViewModel() {
-        mUserRepository = new UserRepository();
+        App.getComponent().inject(this);
     }
 
     public LiveData<Resource<User>> login(User user) {
-//        if (liveDataUser == null) {
           return mUserRepository.login(user);
-//        }
-
-//        return liveDataUser.m;
     }
 
     public LiveData<List<User>> getUsers() {

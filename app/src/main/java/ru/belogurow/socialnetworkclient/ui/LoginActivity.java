@@ -3,6 +3,7 @@ package ru.belogurow.socialnetworkclient.ui;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +14,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import ru.belogurow.socialnetworkclient.R;
-import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
 import ru.belogurow.socialnetworkclient.common.web.Resource;
 import ru.belogurow.socialnetworkclient.users.model.User;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
@@ -27,53 +27,32 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputLayout mTextInputPassword;
     private ProgressBar mProgressBarLogin;
 
+    private Observer<Resource<User>> loginObserver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         initFields();
+        initDataListener();
 
+        mButtonLogin.setOnClickListener(v -> {
+            if (validateFields()) {
+                mProgressBarLogin.setVisibility(View.VISIBLE);
 
-        Observer<Resource<User>> loginObserver = user -> {
-            if (user != null) {
-                if (user.data != null && user.status == NetworkStatus.SUCCESS) {
-                    Toast.makeText(this, user.data.toString(), Toast.LENGTH_LONG).show();
-                }
+                // Parse fields for create new User object
+                User newUser = new User();
+                newUser.setUsername(mTextInputUsername.getEditText().getText().toString());
+                newUser.setPassword(mTextInputPassword.getEditText().getText().toString());
 
-                if (user.message != null && user.status == NetworkStatus.ERROR) {
-                    Toast.makeText(this, user.message, Toast.LENGTH_LONG).show();
-                }
-            } else {
-                Toast.makeText(this, "Client error", Toast.LENGTH_LONG).show();
-            }
-
-
-            mProgressBarLogin.setVisibility(View.GONE);
-        };
-
-
-        mButtonLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (validateFields()) {
-                    mProgressBarLogin.setVisibility(View.VISIBLE);
-
-                    // Parse fields for create new User object
-                    User newUser = new User();
-                    newUser.setUsername(mTextInputUsername.getEditText().getText().toString());
-                    newUser.setPassword(mTextInputPassword.getEditText().getText().toString());
-
-                    mUserViewModel.login(newUser).observe((LifecycleOwner) v.getContext(), loginObserver);
-                }
+                mUserViewModel.login(newUser).observe((LifecycleOwner) v.getContext(), loginObserver);
             }
         });
 
-        mButtonSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Не реализовано", Toast.LENGTH_SHORT).show();
-            }
+        mButtonSignUp.setOnClickListener(v -> {
+            Intent signUpActivity = new Intent(v.getContext(), SignupActivity.class);
+            startActivity(signUpActivity);
         });
     }
 
@@ -87,6 +66,26 @@ public class LoginActivity extends AppCompatActivity {
         mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
 
         mProgressBarLogin.setVisibility(View.GONE);
+    }
+
+    private void initDataListener() {
+        loginObserver = userResource -> {
+            if (userResource == null) {
+                Toast.makeText(this, "Received null data", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            switch (userResource.status) {
+                case SUCCESS:
+                    Toast.makeText(this, userResource.data.toString(), Toast.LENGTH_LONG).show();
+                    break;
+                case ERROR:
+                    Toast.makeText(this, userResource.message, Toast.LENGTH_LONG).show();
+                    break;
+            }
+
+            mProgressBarLogin.setVisibility(View.GONE);
+        };
     }
 
     private boolean validateFields() {
