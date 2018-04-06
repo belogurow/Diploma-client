@@ -17,6 +17,7 @@ import ru.belogurow.socialnetworkclient.users.repository.UserRepository;
  */
 
 public class UserViewModel extends ViewModel {
+    private LiveData<Resource<List<User>>> allUsers;
 
     @Inject
     protected UserRepository mUserRepository;
@@ -34,7 +35,10 @@ public class UserViewModel extends ViewModel {
         return mUserRepository.registration(user);
     }
 
-    public LiveData<List<User>> getUsers() {
-        return mUserRepository.getUsers();
+    public LiveData<Resource<List<User>>> getAllUsers() {
+        if (allUsers == null) {
+            allUsers = mUserRepository.getUsers();
+        }
+        return allUsers;
     }
 }

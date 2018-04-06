@@ -16,8 +16,8 @@ import ru.belogurow.socialnetworkclient.web.SelfSigningClientBuilder;
 
 public class App extends Application {
 
-    public static final String BASE_URL = "https://10.0.2.2:8080";
-//    public static final String BASE_URL = "https://192.168.1.64:8080";
+//    public static final String BASE_URL = "https://10.0.2.2:8080";
+    public static final String BASE_URL = "https://192.168.1.64:8080";
 
     private static  AppComponent sComponent;
     public static WebUserService sWebUserService;

@@ -1,4 +1,4 @@
-package ru.belogurow.socialnetworkclient.ui;
+package ru.belogurow.socialnetworkclient.ui.activity;
 
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;

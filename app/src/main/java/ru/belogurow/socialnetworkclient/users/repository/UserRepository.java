@@ -81,21 +81,22 @@ public class UserRepository {
         return userData;
     }
 
-    public LiveData<List<User>> getUsers() {
-        final MutableLiveData<List<User>> usersData = new MutableLiveData<>();
+    public LiveData<Resource<List<User>>> getUsers() {
+        final MutableLiveData<Resource<List<User>>> usersData = new MutableLiveData<>();
 
         App.sWebUserService.getUsers().enqueue(new Callback<List<User>>() {
             @Override
             public void onResponse(@NonNull Call<List<User>> call, @NonNull Response<List<User>> response) {
                 Log.d(UserRepository.class.getSimpleName(), call.request().toString());
-                if (response.isSuccessful()) {
-                    usersData.postValue(response.body());
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d(TAG, "onResponse: " + response.body());
+                    usersData.postValue(Resource.success(response.body()));
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<List<User>> call, @NonNull Throwable t) {
-                Log.d(UserRepository.class.getSimpleName(), call.request().toString());
+                Log.d(UserRepository.class.getSimpleName(), t.getLocalizedMessage());
             }
         });
         return usersData;
