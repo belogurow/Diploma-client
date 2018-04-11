@@ -37,10 +37,10 @@ public class LoginActivity extends AppCompatActivity {
         initFields();
         initDataListener();
 
-//        mUserViewModel.loginFromDb().observe(this, loginObserver -> {
+//        mUserViewModel.userFromDB().observe(this, loginObserver -> {
 //            Log.d("LOGIN FROM DB", loginObserver.toString());
 //        });
-        mUserViewModel.loginFromDb().observe(this, loginObserver);
+        mUserViewModel.userFromDB().observe(this, loginObserver);
 
         mButtonLogin.setOnClickListener(v -> {
             if (validateFields()) {

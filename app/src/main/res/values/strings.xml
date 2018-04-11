@@ -9,6 +9,7 @@
 
     <!-- Common -->
     <string name="empty_field">Empty filed</string>
+    <string name="else_field">Else</string>
 
     <!-- SignUp Activity-->
     <string name="login_signup">Login</string>
@@ -16,4 +17,12 @@
     <string name="password">Password</string>
     <string name="singup_button">Sing up</string>
     <string name="test_textView">Test</string>
+
+    <!-- Navigation Drawer -->
+    <string name="my_profile">My profile</string>
+    <string name="users">Users</string>
+
+    <!-- MyProfile Fragment -->
+    <string name="log_out_button">Log out</string>
+
 </resources>

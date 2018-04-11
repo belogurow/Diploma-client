@@ -1,5 +1,7 @@
 package ru.belogurow.socialnetworkclient.users.repository;
 
+import android.util.Log;
+
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
@@ -29,10 +31,12 @@ public class LocalUserRepository {
     }
 
     public void deleteAll() {
+        Log.d(TAG, "deleteAll: ");
         mExecutor.execute(() -> mUserDao.deleteAll());
     }
 
     public Flowable<User> getOneUser() {
+        Log.d(TAG, "getOneUser:");
         return mUserDao.getAllRx()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

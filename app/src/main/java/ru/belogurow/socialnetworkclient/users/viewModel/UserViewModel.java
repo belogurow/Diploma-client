@@ -29,6 +29,7 @@ public class UserViewModel extends ViewModel {
     private static final String TAG = UserViewModel.class.getSimpleName();
 
     private MutableLiveData<Resource<List<User>>> allUsers;
+    private MutableLiveData<Resource<User>> currentUser;
 
     @Inject
     protected RemoteUserRepository mRemoteUserRepository;
@@ -43,30 +44,37 @@ public class UserViewModel extends ViewModel {
         mCompositeDisposable = new CompositeDisposable();
     }
 
-    public LiveData<Resource<User>> loginFromDb() {
-        Log.d(TAG, "loginFromDb: ");
+    public void deleteAllDB() {
+        Log.d(TAG, "deleteAllDB: ");
+        mLocalUserRepository.deleteAll();
+    }
 
-        final MutableLiveData<Resource<User>> liveData = new MutableLiveData<>();
+    public LiveData<Resource<User>> userFromDB() {
+        Log.d(TAG, "userFromDB: ");
 
-        mCompositeDisposable.add(
-                mLocalUserRepository.getOneUser()
-                        .subscribe(
-                            userResult -> {
-                                Log.d(TAG, "loginFromDb-result: " + userResult.toString());
-                                liveData.postValue(Resource.success(userResult));
-                            },
-                            error -> {
-                                Log.d(TAG, "loginFromDb-error:" + Arrays.toString(error.getStackTrace()));
+        if (currentUser == null) {
+            currentUser = new MutableLiveData<>();
 
-                                if (error instanceof HttpException)
-                                    liveData.postValue(Resource.error(((HttpException) error).response().errorBody()));
-                                else {
-                                    liveData.postValue(Resource.error(error.getMessage()));
-                                }
-                            })
-        );
+            mCompositeDisposable.add(
+                    mLocalUserRepository.getOneUser()
+                            .subscribe(
+                                    userResult -> {
+                                        Log.d(TAG, "userFromDB-result: " + userResult.toString());
+                                        currentUser.postValue(Resource.success(userResult));
+                                    },
+                                    error -> {
+                                        Log.d(TAG, "userFromDB-error:" + Arrays.toString(error.getStackTrace()));
 
-        return liveData;
+                                        if (error instanceof HttpException)
+                                            currentUser.postValue(Resource.error(((HttpException) error).response().errorBody()));
+                                        else {
+                                            currentUser.postValue(Resource.error(error.getMessage()));
+                                        }
+                                    })
+            );
+        }
+
+        return currentUser;
     }
 
     public LiveData<Resource<User>> login(User user) {
