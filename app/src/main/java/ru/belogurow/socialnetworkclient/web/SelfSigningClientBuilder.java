@@ -2,6 +2,8 @@ package ru.belogurow.socialnetworkclient.web;
 
 import android.content.Context;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
+
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
@@ -16,7 +18,8 @@ import ru.belogurow.socialnetworkclient.R;
 public class SelfSigningClientBuilder {
 
     public static OkHttpClient createClient(Context context) {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new StethoInterceptor());
 
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");

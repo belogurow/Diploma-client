@@ -6,7 +6,8 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import ru.belogurow.socialnetworkclient.users.repository.UserRepository;
+import ru.belogurow.socialnetworkclient.users.repository.LocalUserRepository;
+import ru.belogurow.socialnetworkclient.users.repository.RemoteUserRepository;
 
 @Module
 public class UserModule {
@@ -14,7 +15,14 @@ public class UserModule {
     @Provides
     @NonNull
     @Singleton
-    public UserRepository provideUserRepository() {
-        return new UserRepository();
+    public RemoteUserRepository provideRemoteUserRepository() {
+        return new RemoteUserRepository();
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    public LocalUserRepository provieLocalUserRepository() {
+        return new LocalUserRepository();
     }
 }

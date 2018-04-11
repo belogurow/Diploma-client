@@ -5,13 +5,15 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.widget.ProgressBar;
 
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
 import ru.belogurow.socialnetworkclient.ui.adapter.UsersListAdapter;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class UsersList extends AppCompatActivity {
     private UserViewModel mUserViewModel;
@@ -28,12 +30,14 @@ public class UsersList extends AppCompatActivity {
         initFields();
 
         mUserViewModel.getAllUsers().observe(this, listResource -> {
-            mProgressBar.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(VISIBLE);
+
+
             if (listResource != null && listResource.status == NetworkStatus.SUCCESS) {
                 mUsersAdapter.setUserList(listResource.data);
             }
 
-            mProgressBar.setVisibility(View.GONE);
+            mProgressBar.setVisibility(GONE);
         });
     }
 
@@ -46,7 +50,7 @@ public class UsersList extends AppCompatActivity {
         mUsersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mUsersRecyclerView.setAdapter(mUsersAdapter);
 
-        mProgressBar.setVisibility(View.GONE);
+        mProgressBar.setVisibility(VISIBLE);
 
         mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
     }

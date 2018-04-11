@@ -1,6 +1,10 @@
 package ru.belogurow.socialnetworkclient.users.model;
 
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -10,16 +14,18 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * Created by alexbelogurow on 26.03.2018.
  */
+@Entity
 public class User implements Serializable {
 
+    @PrimaryKey
+    @NonNull
     @SerializedName("id")
     @Expose
-    private UUID id;
+    private String id;
 
     @SerializedName("username")
     @Expose
@@ -35,13 +41,14 @@ public class User implements Serializable {
 
     @SerializedName("userRole")
     @Expose
-    private UserRole userRole;
+    private String userRole;
 
-    public UUID getId() {
+    @NonNull
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(@NonNull String id) {
         this.id = id;
     }
 
@@ -69,11 +76,11 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public UserRole getUserRole() {
+    public String getUserRole() {
         return userRole;
     }
 
-    public void setUserRole(UserRole userRole) {
+    public void setUserRole(String userRole) {
         this.userRole = userRole;
     }
 
