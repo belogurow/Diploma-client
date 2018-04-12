@@ -68,8 +68,8 @@ public class FragmentMyProfile extends Fragment {
 
 
         mUserViewModel.userFromDB().observe(this, userResource -> {
-            if (userResource != null && userResource.status == NetworkStatus.SUCCESS) {
-                User user = userResource.data;
+            if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
+                User user = userResource.getData();
 
                 mFullnameTextView.setText(user.getName());
                 mUsernameTextView.setText(user.getUsername());

@@ -7,6 +7,7 @@ import android.util.Log;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -163,6 +164,33 @@ public class UserViewModel extends ViewModel {
         }
 
         return allUsers;
+    }
+
+    public LiveData<Resource<User>> getUserById(String id) {
+        Log.d(TAG, "getUserById: " + id);
+
+        final MutableLiveData<Resource<User>> liveData = new MutableLiveData<>();
+        mCompositeDisposable.add(
+                mRemoteUserRepository.getUserById(UUID.fromString(id))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                userResult -> {
+                                    Log.d(TAG, "getUserById-result: " + userResult.toString());
+                                    liveData.postValue(Resource.success(userResult));
+                                },
+                                error -> {
+                                    Log.d(TAG, "getUserById-error:" + error.getMessage());
+
+                                    if (error instanceof HttpException)
+                                        liveData.postValue(Resource.error(((HttpException) error).response().errorBody()));
+                                    else {
+                                        liveData.postValue(Resource.error(error.getMessage()));
+                                    }
+                                })
+        );
+
+        return liveData;
     }
 
     @Override

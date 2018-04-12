@@ -70,14 +70,14 @@ public class SignupActivity extends AppCompatActivity {
                 return;
             }
 
-            switch (userResource.status) {
+            switch (userResource.getStatus()) {
                 case SUCCESS:
 //                    Toast.makeText(this, userResource.data.toString(), Toast.LENGTH_LONG).show();
                     finish();
                     startActivity(new Intent(this, MainActivity.class));
                     break;
                 case ERROR:
-                    Toast.makeText(this, userResource.message, Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, userResource.getMessage(), Toast.LENGTH_LONG).show();
                     break;
                 default:
                     Toast.makeText(this, "Unknown status", Toast.LENGTH_LONG).show();

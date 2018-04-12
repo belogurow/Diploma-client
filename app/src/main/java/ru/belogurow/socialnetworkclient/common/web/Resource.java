@@ -16,11 +16,11 @@ import static ru.belogurow.socialnetworkclient.common.web.NetworkStatus.SUCCESS;
 
 public class Resource<T> {
     @NonNull
-    public final NetworkStatus status;
+    private final NetworkStatus status;
     @Nullable
-    public final T data;
+    private final T data;
     @Nullable
-    public final String message;
+    private final String message;
 
     private Resource(@NonNull NetworkStatus status, @Nullable T data, @Nullable String message) {
         this.status = status;
@@ -50,4 +50,18 @@ public class Resource<T> {
         return new Resource<>(ERROR, null, "Api error. See logs.");
     }
 
+    @NonNull
+    public NetworkStatus getStatus() {
+        return status;
+    }
+
+    @Nullable
+    public T getData() {
+        return data;
+    }
+
+    @Nullable
+    public String getMessage() {
+        return message;
+    }
 }

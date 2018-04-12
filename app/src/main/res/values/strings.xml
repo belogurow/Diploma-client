@@ -18,6 +18,9 @@
     <string name="singup_button">Sing up</string>
     <string name="test_textView">Test</string>
 
+    <!-- AboutUser Activity -->
+    <string name="title_about_user">About user</string>
+
     <!-- Navigation Drawer -->
     <string name="my_profile">My profile</string>
     <string name="users">Users</string>

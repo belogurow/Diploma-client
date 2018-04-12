@@ -46,8 +46,8 @@ public class FragmentUserList extends Fragment {
             mProgressBar.setVisibility(VISIBLE);
 
 
-            if (listResource != null && listResource.status == NetworkStatus.SUCCESS) {
-                mUsersAdapter.setUserList(listResource.data);
+            if (listResource != null && listResource.getStatus() == NetworkStatus.SUCCESS) {
+                mUsersAdapter.setUserList(listResource.getData());
             }
 
             mProgressBar.setVisibility(GONE);

@@ -22,7 +22,7 @@ public interface WebUserService {
     Flowable<User> registration(@Body User user);
 
     @GET("/users/{id}")
-    Flowable<User> getUser(@Path("id") UUID id);
+    Flowable<User> getUserById(@Path("id") UUID id);
 
     @GET("users")
     Flowable<List<User>> getUsers();
