@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // TODO: 11.04.2018 ROTATE CHANGE CURRENT FRAGMENT CONFIGURATION
-        
+
         initFragments();
         initDrawer();
     }
@@ -64,11 +65,8 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.my_profile);
                     navigationSelectedItem = 0;
+                    openFragment();
 
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.main_acitivity_container, fragmentMyProfile)
-                            .addToBackStack(null)
-                            .commit();
                     return false;
                 });
 
@@ -78,11 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.users);
                     navigationSelectedItem = 1;
-
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.main_acitivity_container, fragmentUserList)
-                            .addToBackStack(null)
-                            .commit();
+                    openFragment();
 
                     return false;
                 });
@@ -93,11 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.else_field);
                     navigationSelectedItem = 2;
-
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.main_acitivity_container, fragmentUserProfile)
-                            .addToBackStack(null)
-                            .commit();
+                    openFragment();
 
                     return false;
                 });
@@ -116,5 +106,35 @@ public class MainActivity extends AppCompatActivity {
                 )
                 .withSelectedItem(navigationSelectedItem)
                 .build();
+    }
+
+    /**
+     * Open fragment by number of navigationSelectedItem
+     */
+    private void openFragment() {
+        switch (navigationSelectedItem) {
+            case 0:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_acitivity_container, fragmentMyProfile)
+                        .addToBackStack("MY_PROFILE")
+                        .commit();
+                break;
+            case 1:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_acitivity_container, fragmentUserList)
+                        .addToBackStack("USER_LIST")
+                        .commit();
+                break;
+            case 2:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_acitivity_container, fragmentUserProfile)
+                        .addToBackStack("USER_PROFILE")
+                        .commit();
+                break;
+            default:
+                Toast.makeText(this,
+                        "Fragment with number " + navigationSelectedItem + "does not exists!",
+                        Toast.LENGTH_SHORT).show();
+        }
     }
 }
