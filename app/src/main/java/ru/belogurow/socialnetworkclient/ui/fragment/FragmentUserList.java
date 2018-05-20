@@ -21,7 +21,6 @@ import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-//import android.support.v4.app.Fragment;
 
 public class FragmentUserList extends Fragment {
     private UserViewModel mUserViewModel;

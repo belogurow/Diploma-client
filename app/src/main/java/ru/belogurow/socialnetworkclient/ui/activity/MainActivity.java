@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -13,8 +14,10 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import ru.belogurow.socialnetworkclient.R;
+import ru.belogurow.socialnetworkclient.ui.fragment.FragmentChat;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentMyProfile;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentUserList;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentUserProfile;
@@ -26,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private Fragment fragmentUserList;
     private Fragment fragmentUserProfile;
     private Fragment fragmentMyProfile;
+    private Fragment fragmentWebSocketTest;
 
     private int navigationSelectedItem = 0;
 
@@ -44,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         fragmentUserList = new FragmentUserList();
         fragmentUserProfile = new FragmentUserProfile();
         fragmentMyProfile = new FragmentMyProfile();
+
+        fragmentWebSocketTest = new FragmentChat();
 
         mToolbar = findViewById(R.id.toolbar_main_activity);
         setSupportActionBar(mToolbar);
@@ -92,6 +98,19 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 });
 
+        SecondaryDrawerItem websocketItem = new SecondaryDrawerItem()
+                .withIdentifier(3)
+                .withName("WebSocketTest")
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        navigationSelectedItem = 3;
+                        openFragment();
+
+                        return false;
+                    }
+                });
+
         final Drawer drawerResult = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(mToolbar)
@@ -102,7 +121,8 @@ public class MainActivity extends AppCompatActivity {
                         myProfile,
                         users,
                         new DividerDrawerItem(),
-                        elseItem
+                        elseItem,
+                        websocketItem
                 )
                 .withSelectedItem(navigationSelectedItem)
                 .build();
@@ -131,9 +151,14 @@ public class MainActivity extends AppCompatActivity {
                         .addToBackStack("USER_PROFILE")
                         .commit();
                 break;
+            case 3:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_acitivity_container, fragmentWebSocketTest)
+                        .addToBackStack("WEB_SOCKET")
+                        .commit();
             default:
                 Toast.makeText(this,
-                        "Fragment with number " + navigationSelectedItem + "does not exists!",
+                        "Fragment with number " + navigationSelectedItem + " does not exists!",
                         Toast.LENGTH_SHORT).show();
         }
     }

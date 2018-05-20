@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_frag_chat"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/frag_chat_button_send"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </android.support.v7.widget.RecyclerView>
+
+
+    <Button
+        android:id="@+id/frag_chat_button_send"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/send_button"
+        android:textAllCaps="false"
+        style="@style/marginCenterPosition"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <EditText
+        android:id="@+id/frag_chat_message_input"
+        style="@style/marginCenterPosition"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/message"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/frag_chat_button_send"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/frag_chat_button_send"/>
+
+
+</android.support.constraint.ConstraintLayout>
