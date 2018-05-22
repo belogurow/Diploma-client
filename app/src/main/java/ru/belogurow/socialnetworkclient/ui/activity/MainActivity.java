@@ -18,6 +18,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentChat;
+import ru.belogurow.socialnetworkclient.ui.fragment.FragmentDialogs;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentMyProfile;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentUserList;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentUserProfile;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private Fragment fragmentUserList;
     private Fragment fragmentUserProfile;
     private Fragment fragmentMyProfile;
+    private Fragment fragmentDialogs;
     private Fragment fragmentWebSocketTest;
 
     private int navigationSelectedItem = 0;
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentUserList = new FragmentUserList();
         fragmentUserProfile = new FragmentUserProfile();
         fragmentMyProfile = new FragmentMyProfile();
+        fragmentDialogs = new FragmentDialogs();
 
         fragmentWebSocketTest = new FragmentChat();
 
@@ -87,24 +90,35 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 });
 
-        SecondaryDrawerItem elseItem = new SecondaryDrawerItem()
+        PrimaryDrawerItem dialogs = new PrimaryDrawerItem()
                 .withIdentifier(2)
-                .withName(R.string.else_field)
+                .withName(R.string.dialogs)
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
-                    mToolbar.setTitle(R.string.else_field);
+                    mToolbar.setTitle(R.string.dialogs);
                     navigationSelectedItem = 2;
                     openFragment();
 
                     return false;
                 });
 
-        SecondaryDrawerItem websocketItem = new SecondaryDrawerItem()
+        SecondaryDrawerItem elseItem = new SecondaryDrawerItem()
                 .withIdentifier(3)
+                .withName(R.string.else_field)
+                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                    mToolbar.setTitle(R.string.else_field);
+                    navigationSelectedItem = 3;
+                    openFragment();
+
+                    return false;
+                });
+
+        SecondaryDrawerItem websocketItem = new SecondaryDrawerItem()
+                .withIdentifier(4)
                 .withName("WebSocketTest")
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        navigationSelectedItem = 3;
+                        navigationSelectedItem = 4;
                         openFragment();
 
                         return false;
@@ -120,8 +134,8 @@ public class MainActivity extends AppCompatActivity {
                 .addDrawerItems(
                         myProfile,
                         users,
+                        dialogs,
                         new DividerDrawerItem(),
-                        elseItem,
                         websocketItem
                 )
                 .withSelectedItem(navigationSelectedItem)
@@ -147,8 +161,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 2:
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_acitivity_container, fragmentUserProfile)
-                        .addToBackStack("USER_PROFILE")
+                        .replace(R.id.main_acitivity_container, fragmentDialogs)
+                        .addToBackStack("DIALOGS")
                         .commit();
                 break;
             case 3:
@@ -156,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
                         .replace(R.id.main_acitivity_container, fragmentWebSocketTest)
                         .addToBackStack("WEB_SOCKET")
                         .commit();
+                break;
             default:
                 Toast.makeText(this,
                         "Fragment with number " + navigationSelectedItem + " does not exists!",

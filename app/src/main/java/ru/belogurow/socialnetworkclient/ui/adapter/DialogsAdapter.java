@@ -5,33 +5,30 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import ru.belogurow.socialnetworkclient.R;
-import ru.belogurow.socialnetworkclient.chat.model.ChatMessage;
+import ru.belogurow.socialnetworkclient.chat.model.ChatRoom;
 
-public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
+public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHolder>{
 
-    private List<ChatMessage> mMessages;
+    private List<ChatRoom> mChatRooms;
 
-    public void setUserList(List<ChatMessage> messages) {
-        mMessages = messages;
+    public void setChatList(List<ChatRoom> chatRooms) {
+        mChatRooms = chatRooms;
         notifyDataSetChanged();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder{
-        private TextView mMessageTextView;
-        private TextView mTimeTextView;
+//        private TextView mMessageTextView;
+//        private TextView mTimeTextView;
 
         ViewHolder(View itemView) {
             super(itemView);
 
-            mMessageTextView = itemView.findViewById(R.id.item_message_text);
-            mTimeTextView = itemView.findViewById(R.id.item_message_time);
+//            mMessageTextView = itemView.findViewById(R.id.item_message_text);
+//            mTimeTextView = itemView.findViewById(R.id.item_message_time);
 
 //            itemView.setOnClickListener(this);
         }
@@ -56,21 +53,21 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ChatMessage message = mMessages.get(position);
+        ChatRoom message = mChatRooms.get(position);
 
         // Set data
-        holder.mMessageTextView.setText(message.getText());
+//        holder.mMessageTextView.setText(message.getText());
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        holder.mTimeTextView.setText(dateFormat.format(message.getDate()));
+//        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+//        holder.mTimeTextView.setText(dateFormat.format(message.getDate()));
     }
 
     @Override
     public int getItemCount() {
-        if (mMessages == null) {
+        if (mChatRooms == null) {
             return 0;
         } else {
-            return mMessages.size();
+            return mChatRooms.size();
         }
     }
 }

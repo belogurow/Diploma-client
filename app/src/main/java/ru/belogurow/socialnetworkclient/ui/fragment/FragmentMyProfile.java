@@ -42,8 +42,6 @@ public class FragmentMyProfile extends Fragment {
         initFields(view);
         subscribeProfile();
 
-
-
         return view;
     }
 
@@ -65,8 +63,6 @@ public class FragmentMyProfile extends Fragment {
     }
 
     private void subscribeProfile() {
-
-
         mUserViewModel.userFromDB().observe(this, userResource -> {
             if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
                 User user = userResource.getData();

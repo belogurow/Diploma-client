@@ -29,5 +29,6 @@
     <string name="log_out_button">Log out</string>
     <string name="send_button">Send</string>
     <string name="message">Message</string>
+    <string name="dialogs">Dialogs</string>
 
 </resources>

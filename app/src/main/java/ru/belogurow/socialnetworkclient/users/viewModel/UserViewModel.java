@@ -58,6 +58,8 @@ public class UserViewModel extends ViewModel {
 
             mCompositeDisposable.add(
                     mLocalUserRepository.getOneUser()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
                                     userResult -> {
                                         Log.d(TAG, "userFromDB-result: " + userResult.toString());

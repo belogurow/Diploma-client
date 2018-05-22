@@ -14,7 +14,7 @@ import ru.belogurow.socialnetworkclient.users.model.User;
  * Created by alexbelogurow on 26.03.2018.
  */
 
-public interface WebUserService {
+public interface UserWebService {
     @POST("/login")
     Flowable<User> login(@Body User user);
 

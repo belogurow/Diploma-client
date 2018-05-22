@@ -19,7 +19,8 @@ import ru.belogurow.socialnetworkclient.users.model.User;
 public class RemoteUserRepository {
     private static final String TAG = RemoteUserRepository.class.getSimpleName();
 
-    @Inject protected LocalUserRepository mLocalUserRepository;
+    @Inject
+    protected LocalUserRepository mLocalUserRepository;
 
     public RemoteUserRepository() {
         App.getComponent().inject(this);
@@ -34,7 +35,6 @@ public class RemoteUserRepository {
         Log.d(TAG, "login: " + user.toString());
         return App.sWebUserService.login(user);
     }
-
 
     public Flowable<List<User>> getUsers() {
         Log.d(TAG, "getUsers: ");

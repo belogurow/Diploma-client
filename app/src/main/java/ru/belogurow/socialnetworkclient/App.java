@@ -7,11 +7,12 @@ import com.facebook.stetho.Stetho;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import ru.belogurow.socialnetworkclient.chat.service.ChatWebService;
 import ru.belogurow.socialnetworkclient.di.AppComponent;
 import ru.belogurow.socialnetworkclient.di.AppModule;
 import ru.belogurow.socialnetworkclient.di.DaggerAppComponent;
 import ru.belogurow.socialnetworkclient.di.DatabaseModule;
-import ru.belogurow.socialnetworkclient.users.service.WebUserService;
+import ru.belogurow.socialnetworkclient.users.service.UserWebService;
 import ru.belogurow.socialnetworkclient.web.SelfSigningClientBuilder;
 
 /**
@@ -24,7 +25,8 @@ public class App extends Application {
 //    public static final String BASE_URL = "https://192.168.1.64:8080";
 
     private static  AppComponent sComponent;
-    public static WebUserService sWebUserService;
+    public static UserWebService sWebUserService;
+    public static ChatWebService sChatWebService;
 
     @Override
     public void onCreate() {
@@ -47,7 +49,8 @@ public class App extends Application {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        sWebUserService = retrofit.create(WebUserService.class);
+        sWebUserService = retrofit.create(UserWebService.class);
+        sChatWebService = retrofit.create(ChatWebService.class);
     }
 
     private void initDagger() {
