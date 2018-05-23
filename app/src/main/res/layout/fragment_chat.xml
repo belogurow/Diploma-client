@@ -10,7 +10,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/frag_chat_button_send"
+        app:layout_constraintBottom_toTopOf="@+id/button_send_act_chat_room"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -19,7 +19,7 @@
 
 
     <Button
-        android:id="@+id/frag_chat_button_send"
+        android:id="@+id/button_send_act_chat_room"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/send_button"
@@ -37,9 +37,9 @@
         android:ems="10"
         android:hint="@string/message"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/frag_chat_button_send"
+        app:layout_constraintEnd_toStartOf="@+id/button_send_act_chat_room"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/frag_chat_button_send"/>
+        app:layout_constraintTop_toTopOf="@+id/button_send_act_chat_room"/>
 
 
 </android.support.constraint.ConstraintLayout>

@@ -16,6 +16,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 import ru.belogurow.socialnetworkclient.App;
+import ru.belogurow.socialnetworkclient.chat.model.ChatMessage;
 import ru.belogurow.socialnetworkclient.chat.model.ChatRoom;
 import ru.belogurow.socialnetworkclient.chat.repository.RemoteChatRepository;
 import ru.belogurow.socialnetworkclient.common.web.Resource;
@@ -37,7 +38,7 @@ public class ChatViewModel extends ViewModel {
     public LiveData<Resource<ChatRoom>> getChatRoom(ChatRoom chatRoom) {
         Log.d(TAG, "getChatRoom: " + chatRoom);
 
-        MutableLiveData<Resource<ChatRoom>> chatRoomResult = new MutableLiveData<>();
+        final MutableLiveData<Resource<ChatRoom>> chatRoomResult = new MutableLiveData<>();
 
         mCompositeDisposable.add(
                 mRemoteChatRepository.getChatRoom(chatRoom)
@@ -66,7 +67,7 @@ public class ChatViewModel extends ViewModel {
     public LiveData<Resource<List<ChatRoom>>> getAllChatsByUserId(UUID userId) {
         Log.d(TAG, "getAllChatsByUserId: " + userId);
 
-        MutableLiveData<Resource<List<ChatRoom>>> chatRoomListResult = new MutableLiveData<>();
+        final MutableLiveData<Resource<List<ChatRoom>>> chatRoomListResult = new MutableLiveData<>();
 
         mCompositeDisposable.add(
                 mRemoteChatRepository.getAllChatsByUserId(userId)
@@ -74,11 +75,11 @@ public class ChatViewModel extends ViewModel {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 chatResult -> {
-                                    Log.d(TAG, "getAllChatsByUserId: " + userId);
+                                    Log.d(TAG, "getAllChatsByUserId-result: " + userId);
                                     chatRoomListResult.postValue(Resource.success(chatResult));
                                 },
                                 error -> {
-                                    Log.d(TAG, "getAllChatsByUserId: " + Arrays.toString(error.getStackTrace()));
+                                    Log.d(TAG, "getAllChatsByUserId-error: " + Arrays.toString(error.getStackTrace()));
 
                                     if (error instanceof HttpException)
                                         chatRoomListResult.postValue(Resource.error(((HttpException) error).response().errorBody()));
@@ -90,6 +91,35 @@ public class ChatViewModel extends ViewModel {
         );
 
         return chatRoomListResult;
+    }
+
+    public LiveData<Resource<List<ChatMessage>>> getAllMessagesByChatId(UUID chatId) {
+        Log.d(TAG, "getAllMessagesByChatId: " + chatId);
+
+        final MutableLiveData<Resource<List<ChatMessage>>> chatMessageListResult = new MutableLiveData<>();
+
+        mCompositeDisposable.add(
+                mRemoteChatRepository.getAllMessagesByChatId(chatId)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                chatResult -> {
+                                    Log.d(TAG, "getAllMessagesByChatId-result: " + chatId);
+                                    chatMessageListResult.postValue(Resource.success(chatResult));
+                                },
+                                error -> {
+                                    Log.d(TAG, "getAllMessagesByChatId-error: " + Arrays.toString(error.getStackTrace()));
+
+                                    if (error instanceof HttpException)
+                                        chatMessageListResult.postValue(Resource.error(((HttpException) error).response().errorBody()));
+                                    else {
+                                        chatMessageListResult.postValue(Resource.error(error.getMessage()));
+                                    }
+                                })
+
+        );
+
+        return chatMessageListResult;
     }
 
     @Override

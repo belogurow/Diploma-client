@@ -15,8 +15,7 @@ public class ChatRoom {
     public ChatRoom() {
     }
 
-    public ChatRoom(UUID id, UUID firstUserId, UUID secondUserId) {
-        this.id = id;
+    public ChatRoom(UUID firstUserId, UUID secondUserId) {
         this.firstUserId = firstUserId;
         this.secondUserId = secondUserId;
     }

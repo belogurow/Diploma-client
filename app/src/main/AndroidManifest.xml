@@ -33,6 +33,8 @@
         </activity>
         <activity android:name=".ui.activity.UsersList">
         </activity>
+        <activity android:name=".ui.activity.ChatRoomActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                         .addToBackStack("DIALOGS")
                         .commit();
                 break;
-            case 3:
+            case 4:
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.main_acitivity_container, fragmentWebSocketTest)
                         .addToBackStack("WEB_SOCKET")

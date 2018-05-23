@@ -19,6 +19,7 @@ import com.google.gson.GsonBuilder;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import io.reactivex.CompletableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -26,7 +27,7 @@ import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.chat.model.ChatMessage;
-import ru.belogurow.socialnetworkclient.ui.adapter.ChatAdapter;
+import ru.belogurow.socialnetworkclient.ui.adapter.ChatRoomAdapter;
 import ru.belogurow.socialnetworkclient.web.SelfSigningClientBuilder;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.client.StompClient;
@@ -38,7 +39,7 @@ public class FragmentChat extends Fragment {
     private RecyclerView mRecyclerView;
     private EditText mMessageEditText;
     private Button mSendMessageButton;
-    private ChatAdapter mChatAdapter;
+    private ChatRoomAdapter mChatRoomAdapter;
     private StompClient mStompClient;
     private Gson mGson = new GsonBuilder().create();
 
@@ -56,9 +57,11 @@ public class FragmentChat extends Fragment {
 
         initFields(view);
 
+        String id = UUID.randomUUID().toString();
+
         OkHttpClient client = SelfSigningClientBuilder.createClient(getActivity());
-//        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://10.0.2.2:8080/chat", null, client);
-        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://192.168.1.64:8080/chat", null, client);
+        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://10.0.2.2:8080/chatRoom", null, client);
+//        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://192.168.1.64:8080/chat", null, client);
 
         mStompClient.lifecycle()
                 .subscribeOn(Schedulers.io())
@@ -79,16 +82,16 @@ public class FragmentChat extends Fragment {
                 });
 
         // Receive greetings
-        mStompClient.topic("/topic/messages")
+        mStompClient.topic("/topic/messages/" + id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(message -> {
                     Log.d(TAG, "Received " + message);
                     mMessages.add(mGson.fromJson(message.getPayload(), ChatMessage.class));
-                    mChatAdapter.setUserList(mMessages);
+                    mChatRoomAdapter.setMessagesList(mMessages);
                 });
 
-        mStompClient.topic("/topic/chat")
+        mStompClient.topic("/topic/chatRoom/" + id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(stompMessage -> {
@@ -98,7 +101,7 @@ public class FragmentChat extends Fragment {
         mStompClient.connect();
 
         mSendMessageButton.setOnClickListener(v -> {
-            mStompClient.send("/topic/chat", mMessageEditText.getText().toString())
+            mStompClient.send("/topic/chatRoom/" + id, mMessageEditText.getText().toString())
                     .compose(applySchedulers())
                     .subscribe(() -> {
                         Log.d(TAG, "STOMP echo send successfully");
@@ -115,15 +118,15 @@ public class FragmentChat extends Fragment {
     private void initFields(View view) {
         mRecyclerView = view.findViewById(R.id.recycler_frag_chat);
         mMessageEditText = view.findViewById(R.id.frag_chat_message_input);
-        mSendMessageButton = view.findViewById(R.id.frag_chat_button_send);
+        mSendMessageButton = view.findViewById(R.id.button_send_act_chat_room);
 
-        mChatAdapter = new ChatAdapter();
-        mRecyclerView.setAdapter(mChatAdapter);
+        mChatRoomAdapter = new ChatRoomAdapter();
+        mRecyclerView.setAdapter(mChatRoomAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // TODO: 20.05.2018 GET MESSAGES FROM SERVER
         mMessages = new LinkedList<>();
-        mChatAdapter.setUserList(mMessages);
+        mChatRoomAdapter.setMessagesList(mMessages);
     }
 
     protected CompletableTransformer applySchedulers() {
