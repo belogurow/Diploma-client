@@ -68,6 +68,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/message"
+        android:inputType="textCapSentences|textMultiLine"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button_send_act_chat_room"
         app:layout_constraintStart_toStartOf="parent"

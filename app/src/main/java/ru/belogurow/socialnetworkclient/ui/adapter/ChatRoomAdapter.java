@@ -10,11 +10,11 @@ import android.widget.TextView;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.UUID;
 
 import ru.belogurow.socialnetworkclient.R;
+import ru.belogurow.socialnetworkclient.chat.dto.ChatRoomDto;
 import ru.belogurow.socialnetworkclient.chat.model.ChatMessage;
-import ru.belogurow.socialnetworkclient.chat.model.ChatRoom;
+import ru.belogurow.socialnetworkclient.users.model.User;
 
 public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
@@ -22,20 +22,20 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private static final Integer ANOTHER_MESSAGE = 2;
 
     private List<ChatMessage> mMessages;
-    private ChatRoom mChatRoom;
-    private UUID userId;
+    private ChatRoomDto mChatRoomDto;
+    private User currentUser;
 
     public void setMessagesList(List<ChatMessage> messages) {
         mMessages = messages;
         notifyDataSetChanged();
     }
 
-    public void setChatRoom(ChatRoom chatRoom) {
-        mChatRoom = chatRoom;
+    public void setChatRoomDto(ChatRoomDto chatRoomDto) {
+        mChatRoomDto = chatRoomDto;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
     }
 
     class ViewHolderMyMessage extends RecyclerView.ViewHolder{
@@ -66,8 +66,8 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public int getItemViewType(int position) {
         ChatMessage message = mMessages.get(position);
 
-        if (userId.equals(mChatRoom.getFirstUserId()) || userId.equals(mChatRoom.getSecondUserId())) {
-            if (message.getAuthorId().equals(userId)) {
+        if (currentUser.getId().equals(mChatRoomDto.getFirstUser().getId()) || currentUser.getId().equals(mChatRoomDto.getSecondUser().getId())) {
+            if (message.getAuthorId().equals(currentUser.getIdAsUUID())) {
                 return MY_MESSAGE;
             } else {
                 return ANOTHER_MESSAGE;

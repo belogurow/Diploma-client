@@ -32,5 +32,6 @@
     <string name="dialogs">Dialogs</string>
     <string name="button_add_friend">Add friend</string>
     <string name="button_start_dialog">Start dialog</string>
+    <string name="you">You: %1$s</string>
 
 </resources>

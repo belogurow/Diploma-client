@@ -12,9 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import ru.belogurow.socialnetworkclient.R;
-import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
 import ru.belogurow.socialnetworkclient.ui.adapter.UsersListAdapter;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 
@@ -23,6 +23,9 @@ import static android.view.View.VISIBLE;
 
 
 public class FragmentUserList extends Fragment {
+
+    private static final String TAG = FragmentUserList.class.getSimpleName();
+
     private UserViewModel mUserViewModel;
 
     private RecyclerView mUsersRecyclerView;
@@ -41,18 +44,34 @@ public class FragmentUserList extends Fragment {
 
         initFields(view);
 
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
         mUserViewModel.getAllUsers().observe(this, listResource -> {
             mProgressBar.setVisibility(VISIBLE);
 
+            if (listResource == null) {
+                Toast.makeText(getActivity(), "Received null data", Toast.LENGTH_LONG).show();
+                return;
+            }
 
-            if (listResource != null && listResource.getStatus() == NetworkStatus.SUCCESS) {
-                mUsersAdapter.setUserList(listResource.getData());
+            switch (listResource.getStatus()) {
+                case SUCCESS:
+                    mUsersAdapter.setUserList(listResource.getData());
+                    break;
+                case ERROR:
+                    Toast.makeText(getActivity(), listResource.getMessage(), Toast.LENGTH_LONG).show();
+                    break;
+                default:
+                    Toast.makeText(getActivity(), "Unknown status", Toast.LENGTH_LONG).show();
             }
 
             mProgressBar.setVisibility(GONE);
         });
-
-        return view;
     }
 
     private void initFields(View view) {

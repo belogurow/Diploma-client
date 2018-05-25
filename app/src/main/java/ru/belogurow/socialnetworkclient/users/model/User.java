@@ -14,6 +14,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * Created by alexbelogurow on 26.03.2018.
@@ -82,6 +83,14 @@ public class User implements Serializable {
 
     public void setUserRole(String userRole) {
         this.userRole = userRole;
+    }
+
+    public UUID getIdAsUUID() {
+        return UUID.fromString(id);
+    }
+
+    public boolean equalsById(User user) {
+        return this.id.equals(user.getId());
     }
 
     @Override

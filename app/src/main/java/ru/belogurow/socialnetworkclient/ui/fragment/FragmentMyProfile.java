@@ -64,12 +64,17 @@ public class FragmentMyProfile extends Fragment {
 
     private void subscribeProfile() {
         mUserViewModel.userFromDB().observe(this, userResource -> {
+            // TODO: 24.05.2018 INIT PROGRESS BAR
+
             if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
                 User user = userResource.getData();
 
                 mFullnameTextView.setText(user.getName());
                 mUsernameTextView.setText(user.getUsername());
             }
+
+            // TODO: 24.05.2018 CANCEL PROGRESS BAR
+//            mProgressBar.setVisibility(GONE);
         });
     }
 }

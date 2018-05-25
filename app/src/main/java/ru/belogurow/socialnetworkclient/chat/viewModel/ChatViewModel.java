@@ -16,6 +16,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 import ru.belogurow.socialnetworkclient.App;
+import ru.belogurow.socialnetworkclient.chat.dto.ChatRoomDto;
 import ru.belogurow.socialnetworkclient.chat.model.ChatMessage;
 import ru.belogurow.socialnetworkclient.chat.model.ChatRoom;
 import ru.belogurow.socialnetworkclient.chat.repository.RemoteChatRepository;
@@ -35,10 +36,10 @@ public class ChatViewModel extends ViewModel {
         mCompositeDisposable = new CompositeDisposable();
     }
 
-    public LiveData<Resource<ChatRoom>> getChatRoom(ChatRoom chatRoom) {
+    public LiveData<Resource<ChatRoomDto>> getChatRoom(ChatRoom chatRoom) {
         Log.d(TAG, "getChatRoom: " + chatRoom);
 
-        final MutableLiveData<Resource<ChatRoom>> chatRoomResult = new MutableLiveData<>();
+        final MutableLiveData<Resource<ChatRoomDto>> chatRoomResult = new MutableLiveData<>();
 
         mCompositeDisposable.add(
                 mRemoteChatRepository.getChatRoom(chatRoom)
@@ -64,10 +65,10 @@ public class ChatViewModel extends ViewModel {
         return chatRoomResult;
     }
 
-    public LiveData<Resource<List<ChatRoom>>> getAllChatsByUserId(UUID userId) {
+    public LiveData<Resource<List<ChatRoomDto>>> getAllChatsByUserId(UUID userId) {
         Log.d(TAG, "getAllChatsByUserId: " + userId);
 
-        final MutableLiveData<Resource<List<ChatRoom>>> chatRoomListResult = new MutableLiveData<>();
+        final MutableLiveData<Resource<List<ChatRoomDto>>> chatRoomListResult = new MutableLiveData<>();
 
         mCompositeDisposable.add(
                 mRemoteChatRepository.getAllChatsByUserId(userId)
@@ -75,7 +76,7 @@ public class ChatViewModel extends ViewModel {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 chatResult -> {
-                                    Log.d(TAG, "getAllChatsByUserId-result: " + userId);
+                                    Log.d(TAG, "getAllChatsByUserId-result: " + chatResult);
                                     chatRoomListResult.postValue(Resource.success(chatResult));
                                 },
                                 error -> {
@@ -104,7 +105,7 @@ public class ChatViewModel extends ViewModel {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 chatResult -> {
-                                    Log.d(TAG, "getAllMessagesByChatId-result: " + chatId);
+                                    Log.d(TAG, "getAllMessagesByChatId-result: " + chatResult);
                                     chatMessageListResult.postValue(Resource.success(chatResult));
                                 },
                                 error -> {

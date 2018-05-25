@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 
 import io.reactivex.Flowable;
 import ru.belogurow.socialnetworkclient.App;
+import ru.belogurow.socialnetworkclient.chat.dto.ChatRoomDto;
 import ru.belogurow.socialnetworkclient.chat.model.ChatMessage;
 import ru.belogurow.socialnetworkclient.chat.model.ChatRoom;
 
@@ -16,12 +17,12 @@ import ru.belogurow.socialnetworkclient.chat.model.ChatRoom;
 public class RemoteChatRepository {
     private static final String TAG = RemoteChatRepository.class.getSimpleName();
 
-    public Flowable<ChatRoom> getChatRoom(ChatRoom chatRoom) {
+    public Flowable<ChatRoomDto> getChatRoom(ChatRoom chatRoom) {
         Log.d(TAG, "getChatRoom: " + chatRoom);
         return App.sChatWebService.getChatRoom(chatRoom);
     }
 
-    public Flowable<List<ChatRoom>> getAllChatsByUserId(UUID userId) {
+    public Flowable<List<ChatRoomDto>> getAllChatsByUserId(UUID userId) {
         Log.d(TAG, "getAllChatsByUserId: " + userId);
         return App.sChatWebService.getAllChatsByUserId(userId);
     }

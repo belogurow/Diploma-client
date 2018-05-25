@@ -58,6 +58,7 @@ public class FragmentDialogs extends Fragment {
                 mChatViewModel.getAllChatsByUserId(UUID.fromString(currentUser.getId())).observe(this, chatResource -> {
                     if (chatResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
                         mDialogsAdapter.setChatList(chatResource.getData());
+                        mDialogsAdapter.setCurrentUser(currentUser);
                     }
                 });
             }

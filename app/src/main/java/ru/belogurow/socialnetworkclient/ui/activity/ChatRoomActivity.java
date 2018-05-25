@@ -26,6 +26,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import ru.belogurow.socialnetworkclient.R;
+import ru.belogurow.socialnetworkclient.chat.dto.ChatRoomDto;
 import ru.belogurow.socialnetworkclient.chat.model.ChatMessage;
 import ru.belogurow.socialnetworkclient.chat.model.ChatRoom;
 import ru.belogurow.socialnetworkclient.chat.viewModel.ChatViewModel;
@@ -64,38 +65,63 @@ public class ChatRoomActivity extends AppCompatActivity {
         initFields();
 
         Intent intent = getIntent();
-        UUID secondUserId = UUID.fromString(intent.getStringExtra(Extras.EXTRA_USER_ID));
+        String anotherUserId = intent.getStringExtra(Extras.EXTRA_USER_ID);
 
-        mUserViewModel.userFromDB().observe(this, userResource -> {
-            if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
-                User currentUser = userResource.getData();
+        if (anotherUserId != null) {
+            mUserViewModel.userFromDB().observe(this, userResource -> {
+                mProgressBar.setVisibility(View.VISIBLE);
 
-                mChatViewModel.getChatRoom(new ChatRoom(UUID.fromString(currentUser.getId()), secondUserId))
-                        .observe(this, chatRoomResource -> {
-                            if (chatRoomResource == null) {
-                                Toast.makeText(this, "Received null data", Toast.LENGTH_LONG).show();
-                                return;
-                            }
+                if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
+                    User currentUser = userResource.getData();
 
-                            switch (chatRoomResource.getStatus()) {
-                                case SUCCESS:
-                                    ChatRoom chatRoom = chatRoomResource.getData();
-                                    mChatRoomAdapter.setChatRoom(chatRoom);
-                                    mChatRoomAdapter.setUserId(UUID.fromString(currentUser.getId()));
-                                    getAllMessages(chatRoom);
-                                    initStomp(chatRoom, currentUser);
-                                    break;
-                                case ERROR:
-                                    Toast.makeText(this, userResource.getMessage(), Toast.LENGTH_LONG).show();
-                                    break;
-                                default:
-                                    Toast.makeText(this, "Unknown status", Toast.LENGTH_LONG).show();
-                            }
-                        });
-            }
+                    mChatViewModel.getChatRoom(new ChatRoom(currentUser.getIdAsUUID(), UUID.fromString(anotherUserId)))
+                            .observe(this, chatRoomResource -> {
+                                if (chatRoomResource == null) {
+                                    Toast.makeText(this, "Received null data", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
 
-            mProgressBar.setVisibility(View.GONE);
-        });
+                                switch (chatRoomResource.getStatus()) {
+                                    case SUCCESS:
+                                        ChatRoomDto chatRoomDtoData = chatRoomResource.getData();
+                                        initChatData(chatRoomDtoData, currentUser);
+                                        break;
+                                    case ERROR:
+                                        Toast.makeText(this, userResource.getMessage(), Toast.LENGTH_LONG).show();
+                                        break;
+                                    default:
+                                        Toast.makeText(this, "Unknown status", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                }
+
+                mProgressBar.setVisibility(View.GONE);
+            });
+        } else {
+            ChatRoomDto chatRoomDto = (ChatRoomDto) intent.getSerializableExtra(Extras.EXTRA_CHAT_ROOM_DTO);
+            mUserViewModel.userFromDB().observe(this, userResource -> {
+                        mProgressBar.setVisibility(View.VISIBLE);
+
+                if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
+                    User currentUser = userResource.getData();
+                    initChatData(chatRoomDto, currentUser);
+                }
+
+                mProgressBar.setVisibility(View.GONE);
+            });
+        }
+    }
+
+    private void initChatData(ChatRoomDto chatRoomDto, User currentUser) {
+        if (currentUser.equalsById(chatRoomDto.getFirstUser())) {
+            setChatRoomTitle(chatRoomDto.getSecondUser());
+        } else {
+            setChatRoomTitle(chatRoomDto.getFirstUser());
+        }
+        mChatRoomAdapter.setChatRoomDto(chatRoomDto);
+        mChatRoomAdapter.setCurrentUser(currentUser);
+        getAllMessages(chatRoomDto);
+        initStomp(chatRoomDto, currentUser);
     }
 
     private void initFields() {
@@ -107,7 +133,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         mToolbar = findViewById(R.id.toolbar_act_chat_room);
         setSupportActionBar(mToolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Чат // TODO");
+            getSupportActionBar().setTitle("");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
@@ -125,8 +151,15 @@ public class ChatRoomActivity extends AppCompatActivity {
         mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
     }
 
-    private void getAllMessages(ChatRoom chatRoom) {
-        mChatViewModel.getAllMessagesByChatId(chatRoom.getId()).observe(this, chatMessageResource -> {
+    private void setChatRoomTitle(User anotherUser) {
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(anotherUser.getName());
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    private void getAllMessages(ChatRoomDto chatRoomDto) {
+        mChatViewModel.getAllMessagesByChatId(chatRoomDto.getId()).observe(this, chatMessageResource -> {
             if (chatMessageResource == null) {
                 Toast.makeText(this, "Received null data", Toast.LENGTH_LONG).show();
                 return;
@@ -147,12 +180,13 @@ public class ChatRoomActivity extends AppCompatActivity {
         });
     }
 
-    private void initStomp(ChatRoom chatRoom, User currentUser) {
+    private void initStomp(ChatRoomDto chatRoomDto, User currentUser) {
         OkHttpClient client = SelfSigningClientBuilder.createClient(this);
 
-//        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://192.168.1.64:8080/chat", null, client);
-//        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://10.0.2.2:8080/chat/" + chatRoom.getId().toString() + "/" + chatRoom.getFirstUserId().toString(), null, client);
-        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://10.0.2.2:8080/chatRoom", null, client);
+//        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://192.168.1.64:8090/chat", null, client);
+//        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://10.0.2.2:8090/chat/" + chatRoom.getId().toString() + "/" + chatRoom.getFirstUserId().toString(), null, client);
+        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://10.0.2.2:8090/chatRoom", null, client);
+//        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://94.250.254.169:8090/chatRoom", null, client);
 
         mStompClient.lifecycle()
                 .subscribeOn(Schedulers.io())
@@ -173,7 +207,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 });
 
         // Receive greetings
-        mStompClient.topic("/topic/chatRoom/" + chatRoom.getId().toString() + "/messages")
+        mStompClient.topic("/topic/chatRoom/" + chatRoomDto.getId().toString() + "/messages")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(message -> {
@@ -183,7 +217,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                     mRecyclerView.scrollToPosition(mMessages.size() - 1);
                 });
 
-        mStompClient.topic("/topic/chatRoom/" + chatRoom.getId() + "/" + currentUser.getId())
+        mStompClient.topic("/topic/chatRoom/" + chatRoomDto.getId() + "/" + currentUser.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(stompMessage -> {
@@ -193,7 +227,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         mStompClient.connect();
 
         mSendMessageButton.setOnClickListener(v -> {
-            mStompClient.send("/topic/chatRoom/" + chatRoom.getId() + "/" + currentUser.getId(), mMessageEditText.getText().toString())
+            mStompClient.send("/topic/chatRoom/" + chatRoomDto.getId() + "/" + currentUser.getId(), mMessageEditText.getText().toString())
                     .compose(applySchedulers())
                     .subscribe(() -> {
                         Log.d(TAG, "STOMP echo send successfully");
