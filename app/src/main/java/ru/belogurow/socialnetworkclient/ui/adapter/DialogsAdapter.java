@@ -1,5 +1,6 @@
 package ru.belogurow.socialnetworkclient.ui.adapter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -9,30 +10,41 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.signature.ObjectKey;
+
 import java.util.List;
 
+import ru.belogurow.socialnetworkclient.App;
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.chat.dto.ChatRoomDto;
+import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
 import ru.belogurow.socialnetworkclient.common.extra.Extras;
+import ru.belogurow.socialnetworkclient.common.web.GlideApp;
 import ru.belogurow.socialnetworkclient.ui.activity.ChatRoomActivity;
-import ru.belogurow.socialnetworkclient.users.model.User;
+import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 
 public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHolder>{
 
     private List<ChatRoomDto> mChatRoomDtos;
-    private User currentUser;
+    private UserDto currentUser;
+    private Context mContext;
 
     public void setChatList(List<ChatRoomDto> chatRooms) {
         mChatRoomDtos = chatRooms;
         notifyDataSetChanged();
     }
 
-    public void setCurrentUser(User currentUser) {
+    public DialogsAdapter(Context context) {
+        mContext = context;
+    }
+
+    public void setCurrentUser(UserDto currentUser) {
         this.currentUser = currentUser;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private ImageView mImageView;
+        private ImageView mImageViewAvatar;
         private TextView mFullnameTextView;
         private TextView mMessageTextView;
 
@@ -41,6 +53,7 @@ public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHold
 
             mMessageTextView = itemView.findViewById(R.id.item_user_last_message_text);
             mFullnameTextView = itemView.findViewById(R.id.item_user_last_message_fullname_text);
+            mImageViewAvatar = itemView.findViewById(R.id.item_user_last_message_avatar_image);
 //            mTimeTextView = itemView.findViewById(R.id.item_message_time);
             itemView.setOnClickListener(this);
         }
@@ -66,20 +79,39 @@ public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ChatRoomDto chatRoomDto = mChatRoomDtos.get(position);
+        UserDto anotherUser = null;
 
-        // Set data
-        if (currentUser.getIdAsUUID().equals(chatRoomDto.getLastChatMessage().getAuthorId())) {
+        // Set message text
+        if (currentUser.getId().equals(chatRoomDto.getLastChatMessage().getAuthorId())) {
             holder.mMessageTextView.setText(holder.itemView.getContext().getResources().getString(R.string.you, chatRoomDto.getLastChatMessage().getText()));
         } else {
             holder.mMessageTextView.setText(chatRoomDto.getLastChatMessage().getText());
         }
 
+        // Set another user
         if (currentUser.equalsById(chatRoomDto.getFirstUser())) {
-            holder.mFullnameTextView.setText(chatRoomDto.getSecondUser().getName());
+            anotherUser = chatRoomDto.getSecondUser();
         } else {
-            holder.mFullnameTextView.setText(chatRoomDto.getFirstUser().getName());
+            anotherUser = chatRoomDto.getFirstUser();
         }
-//        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+        // Set fullname
+        holder.mFullnameTextView.setText(anotherUser.getName());
+
+        // Set avatar image
+        if (anotherUser.getUserProfile() != null && anotherUser.getUserProfile().getAvatarFile() != null) {
+            setImageWithGlide(anotherUser.getUserProfile().getAvatarFile(), holder);
+        }
+    }
+
+    private void setImageWithGlide(FileEntityDto avatarFile, ViewHolder viewHolder) {
+        GlideApp.with(mContext)
+                .load(App.BASE_URL + avatarFile.getDataUrl())
+                .fitCenter()
+                .transition(DrawableTransitionOptions.withCrossFade())
+//                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .signature(new ObjectKey(avatarFile.getDataUrl()))
+                .into(viewHolder.mImageViewAvatar);
     }
 
     @Override

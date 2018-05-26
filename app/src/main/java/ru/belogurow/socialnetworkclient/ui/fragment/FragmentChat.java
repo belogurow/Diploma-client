@@ -26,7 +26,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import ru.belogurow.socialnetworkclient.R;
-import ru.belogurow.socialnetworkclient.chat.model.ChatMessage;
+import ru.belogurow.socialnetworkclient.chat.dto.ChatMessageDto;
 import ru.belogurow.socialnetworkclient.ui.adapter.ChatRoomAdapter;
 import ru.belogurow.socialnetworkclient.web.SelfSigningClientBuilder;
 import ua.naiksoftware.stomp.Stomp;
@@ -43,7 +43,7 @@ public class FragmentChat extends Fragment {
     private StompClient mStompClient;
     private Gson mGson = new GsonBuilder().create();
 
-    private List<ChatMessage> mMessages;
+    private List<ChatMessageDto> mMessages;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,7 +87,7 @@ public class FragmentChat extends Fragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(message -> {
                     Log.d(TAG, "Received " + message);
-                    mMessages.add(mGson.fromJson(message.getPayload(), ChatMessage.class));
+                    mMessages.add(mGson.fromJson(message.getPayload(), ChatMessageDto.class));
                     mChatRoomAdapter.setMessagesList(mMessages);
                 });
 

@@ -25,15 +25,16 @@ import io.reactivex.CompletableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
+import ru.belogurow.socialnetworkclient.App;
 import ru.belogurow.socialnetworkclient.R;
+import ru.belogurow.socialnetworkclient.chat.dto.ChatMessageDto;
 import ru.belogurow.socialnetworkclient.chat.dto.ChatRoomDto;
-import ru.belogurow.socialnetworkclient.chat.model.ChatMessage;
 import ru.belogurow.socialnetworkclient.chat.model.ChatRoom;
 import ru.belogurow.socialnetworkclient.chat.viewModel.ChatViewModel;
 import ru.belogurow.socialnetworkclient.common.extra.Extras;
 import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
 import ru.belogurow.socialnetworkclient.ui.adapter.ChatRoomAdapter;
-import ru.belogurow.socialnetworkclient.users.model.User;
+import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 import ru.belogurow.socialnetworkclient.web.SelfSigningClientBuilder;
 import ua.naiksoftware.stomp.Stomp;
@@ -54,7 +55,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ChatRoomAdapter mChatRoomAdapter;
     private StompClient mStompClient;
 
-    private List<ChatMessage> mMessages;
+    private List<ChatMessageDto> mMessages;
     private Gson mGson = new GsonBuilder().create();
 
     @Override
@@ -65,16 +66,16 @@ public class ChatRoomActivity extends AppCompatActivity {
         initFields();
 
         Intent intent = getIntent();
-        String anotherUserId = intent.getStringExtra(Extras.EXTRA_USER_ID);
+        UUID anotherUserId = (UUID) intent.getSerializableExtra(Extras.EXTRA_USER_ID);
 
         if (anotherUserId != null) {
             mUserViewModel.userFromDB().observe(this, userResource -> {
                 mProgressBar.setVisibility(View.VISIBLE);
 
                 if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
-                    User currentUser = userResource.getData();
+                    UserDto currentUser = userResource.getData();
 
-                    mChatViewModel.getChatRoom(new ChatRoom(currentUser.getIdAsUUID(), UUID.fromString(anotherUserId)))
+                    mChatViewModel.getChatRoom(new ChatRoom(currentUser.getId(), anotherUserId))
                             .observe(this, chatRoomResource -> {
                                 if (chatRoomResource == null) {
                                     Toast.makeText(this, "Received null data", Toast.LENGTH_LONG).show();
@@ -103,7 +104,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                         mProgressBar.setVisibility(View.VISIBLE);
 
                 if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
-                    User currentUser = userResource.getData();
+                    UserDto currentUser = userResource.getData();
                     initChatData(chatRoomDto, currentUser);
                 }
 
@@ -112,7 +113,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         }
     }
 
-    private void initChatData(ChatRoomDto chatRoomDto, User currentUser) {
+    private void initChatData(ChatRoomDto chatRoomDto, UserDto currentUser) {
         if (currentUser.equalsById(chatRoomDto.getFirstUser())) {
             setChatRoomTitle(chatRoomDto.getSecondUser());
         } else {
@@ -151,7 +152,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
     }
 
-    private void setChatRoomTitle(User anotherUser) {
+    private void setChatRoomTitle(UserDto anotherUser) {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(anotherUser.getName());
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -180,12 +181,11 @@ public class ChatRoomActivity extends AppCompatActivity {
         });
     }
 
-    private void initStomp(ChatRoomDto chatRoomDto, User currentUser) {
+    private void initStomp(ChatRoomDto chatRoomDto, UserDto currentUser) {
         OkHttpClient client = SelfSigningClientBuilder.createClient(this);
 
 //        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://192.168.1.64:8090/chat", null, client);
-//        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://10.0.2.2:8090/chat/" + chatRoom.getId().toString() + "/" + chatRoom.getFirstUserId().toString(), null, client);
-        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://10.0.2.2:8090/chatRoom", null, client);
+        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, App.BASE_WEB_SOCKET_URL + "/chatRoom", null, client);
 //        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://94.250.254.169:8090/chatRoom", null, client);
 
         mStompClient.lifecycle()
@@ -198,6 +198,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                             break;
                         case ERROR:
                             Log.d(TAG, "Stomp connection error", lifecycleEvent.getException());
+                            Toast.makeText(this, lifecycleEvent.getException().toString(), Toast.LENGTH_SHORT).show();
 //                            toast("Stomp connection error");
                             break;
                         case CLOSED:
@@ -212,7 +213,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(message -> {
                     Log.d(TAG, "Received " + message);
-                    mMessages.add(mGson.fromJson(message.getPayload(), ChatMessage.class));
+                    mMessages.add(mGson.fromJson(message.getPayload(), ChatMessageDto.class));
                     mChatRoomAdapter.setMessagesList(mMessages);
                     mRecyclerView.scrollToPosition(mMessages.size() - 1);
                 });

@@ -34,5 +34,6 @@
     <string name="button_start_dialog">Start dialog</string>
     <string name="you">You: %1$s</string>
     <string name="pick_photo_for_avatar">Pick photo for avatar</string>
+    <string name="received_null_data">Received null data</string>
 
 </resources>

@@ -8,8 +8,8 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import ru.belogurow.socialnetworkclient.chat.dto.ChatMessageDto;
 import ru.belogurow.socialnetworkclient.chat.dto.ChatRoomDto;
-import ru.belogurow.socialnetworkclient.chat.model.ChatMessage;
 import ru.belogurow.socialnetworkclient.chat.model.ChatRoom;
 
 public interface ChatWebService {
@@ -20,5 +20,5 @@ public interface ChatWebService {
     Flowable<List<ChatRoomDto>> getAllChatsByUserId(@Path("userId") UUID userId);
 
     @GET("/chat/{chatId}/messages")
-    Flowable<List<ChatMessage>> getAllMessagesByChatId(@Path("chatId") UUID chatId);
+    Flowable<List<ChatMessageDto>> getAllMessagesByChatId(@Path("chatId") UUID chatId);
 }

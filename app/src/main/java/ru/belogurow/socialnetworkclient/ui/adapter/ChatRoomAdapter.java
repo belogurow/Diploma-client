@@ -12,20 +12,20 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import ru.belogurow.socialnetworkclient.R;
+import ru.belogurow.socialnetworkclient.chat.dto.ChatMessageDto;
 import ru.belogurow.socialnetworkclient.chat.dto.ChatRoomDto;
-import ru.belogurow.socialnetworkclient.chat.model.ChatMessage;
-import ru.belogurow.socialnetworkclient.users.model.User;
+import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 
 public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private static final Integer MY_MESSAGE = 1;
     private static final Integer ANOTHER_MESSAGE = 2;
 
-    private List<ChatMessage> mMessages;
+    private List<ChatMessageDto> mMessages;
     private ChatRoomDto mChatRoomDto;
-    private User currentUser;
+    private UserDto currentUser;
 
-    public void setMessagesList(List<ChatMessage> messages) {
+    public void setMessagesList(List<ChatMessageDto> messages) {
         mMessages = messages;
         notifyDataSetChanged();
     }
@@ -34,7 +34,7 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         mChatRoomDto = chatRoomDto;
     }
 
-    public void setCurrentUser(User currentUser) {
+    public void setCurrentUser(UserDto currentUser) {
         this.currentUser = currentUser;
     }
 
@@ -64,10 +64,10 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-        ChatMessage message = mMessages.get(position);
+        ChatMessageDto message = mMessages.get(position);
 
-        if (currentUser.getId().equals(mChatRoomDto.getFirstUser().getId()) || currentUser.getId().equals(mChatRoomDto.getSecondUser().getId())) {
-            if (message.getAuthorId().equals(currentUser.getIdAsUUID())) {
+        if (currentUser.equalsById(mChatRoomDto.getFirstUser()) || currentUser.equalsById(mChatRoomDto.getSecondUser())) {
+            if (message.getAuthorId().equals(currentUser.getId())) {
                 return MY_MESSAGE;
             } else {
                 return ANOTHER_MESSAGE;
@@ -92,7 +92,7 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        ChatMessage message = mMessages.get(position);
+        ChatMessageDto message = mMessages.get(position);
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
         if (holder.getItemViewType() == MY_MESSAGE) {

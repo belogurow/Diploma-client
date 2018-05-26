@@ -7,17 +7,16 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.io.Serializable;
 import java.util.UUID;
 
-import ru.belogurow.socialnetworkclient.chat.model.ChatMessage;
-import ru.belogurow.socialnetworkclient.users.model.User;
+import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 
 public class ChatRoomDto implements Serializable {
 
     private UUID id;
-    private User firstUser;
-    private User secondUser;
-    private ChatMessage lastChatMessage;
+    private UserDto firstUser;
+    private UserDto secondUser;
+    private ChatMessageDto lastChatMessage;
 
-    public ChatRoomDto(UUID id, User firstUser, User secondUser, ChatMessage lastChatMessage) {
+    public ChatRoomDto(UUID id, UserDto firstUser, UserDto secondUser, ChatMessageDto lastChatMessage) {
         this.id = id;
         this.firstUser = firstUser;
         this.secondUser = secondUser;
@@ -35,27 +34,27 @@ public class ChatRoomDto implements Serializable {
         this.id = id;
     }
 
-    public User getFirstUser() {
+    public UserDto getFirstUser() {
         return firstUser;
     }
 
-    public void setFirstUser(User firstUser) {
+    public void setFirstUser(UserDto firstUser) {
         this.firstUser = firstUser;
     }
 
-    public User getSecondUser() {
+    public UserDto getSecondUser() {
         return secondUser;
     }
 
-    public void setSecondUser(User secondUser) {
+    public void setSecondUser(UserDto secondUser) {
         this.secondUser = secondUser;
     }
 
-    public ChatMessage getLastChatMessage() {
+    public ChatMessageDto getLastChatMessage() {
         return lastChatMessage;
     }
 
-    public void setLastChatMessage(ChatMessage lastChatMessage) {
+    public void setLastChatMessage(ChatMessageDto lastChatMessage) {
         this.lastChatMessage = lastChatMessage;
     }
 

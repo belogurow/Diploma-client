@@ -44,7 +44,7 @@ public class UsersList extends AppCompatActivity {
     private void initFields() {
         mUsersRecyclerView = findViewById(R.id.users_list_recyclerView);
         mProgressBar = findViewById(R.id.users_list_progressBar);
-        mUsersAdapter = new UsersListAdapter();
+        mUsersAdapter = new UsersListAdapter(this);
 
         mUsersRecyclerView.setHasFixedSize(true);
         mUsersRecyclerView.setLayoutManager(new LinearLayoutManager(this));

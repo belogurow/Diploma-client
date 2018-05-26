@@ -14,13 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import java.util.UUID;
-
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.chat.viewModel.ChatViewModel;
 import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
 import ru.belogurow.socialnetworkclient.ui.adapter.DialogsAdapter;
-import ru.belogurow.socialnetworkclient.users.model.User;
+import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 
 import static android.view.View.GONE;
@@ -37,7 +35,7 @@ public class FragmentDialogs extends Fragment {
     private DialogsAdapter mDialogsAdapter;
     private ProgressBar mProgressBar;
 
-    private User currentUser;
+    private UserDto currentUser;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,11 +49,21 @@ public class FragmentDialogs extends Fragment {
 
         initFields(view);
 
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+
         mUserViewModel.userFromDB().observe(this, userResource -> {
+            mProgressBar.setVisibility(VISIBLE);
+
             if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
                 currentUser = userResource.getData();
 
-                mChatViewModel.getAllChatsByUserId(UUID.fromString(currentUser.getId())).observe(this, chatResource -> {
+                mChatViewModel.getAllChatsByUserId(currentUser.getId()).observe(this, chatResource -> {
                     if (chatResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
                         mDialogsAdapter.setChatList(chatResource.getData());
                         mDialogsAdapter.setCurrentUser(currentUser);
@@ -66,21 +74,17 @@ public class FragmentDialogs extends Fragment {
             mProgressBar.setVisibility(GONE);
         });
 
-
-        return view;
     }
 
     private void initFields(View view) {
         mRecyclerView = view.findViewById(R.id.recycler_frag_user_list);
         mProgressBar = view.findViewById(R.id.progress_frag_user_list);
-        mDialogsAdapter = new DialogsAdapter();
+        mDialogsAdapter = new DialogsAdapter(view.getContext());
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         mRecyclerView.setAdapter(mDialogsAdapter);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(),
                 DividerItemDecoration.VERTICAL));
-
-        mProgressBar.setVisibility(VISIBLE);
 
         mChatViewModel = ViewModelProviders.of(this).get(ChatViewModel.class);
         mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);

@@ -13,8 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.signature.ObjectKey;
 
 import org.apache.commons.io.FileUtils;
 
@@ -23,13 +27,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import ru.belogurow.socialnetworkclient.App;
 import ru.belogurow.socialnetworkclient.R;
+import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
 import ru.belogurow.socialnetworkclient.chat.model.FileEntity;
 import ru.belogurow.socialnetworkclient.chat.model.FileType;
 import ru.belogurow.socialnetworkclient.chat.viewModel.FileViewModel;
+import ru.belogurow.socialnetworkclient.common.web.GlideApp;
 import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
 import ru.belogurow.socialnetworkclient.ui.activity.LoginActivity;
-import ru.belogurow.socialnetworkclient.users.model.User;
+import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 
 public class FragmentMyProfile extends Fragment {
@@ -42,9 +49,10 @@ public class FragmentMyProfile extends Fragment {
     private ImageView mUserAvatarImageView;
     private TextView mFullnameTextView;
     private TextView mUsernameTextView;
+    private ProgressBar mProgressBar;
     private Button mLogOutButton;
 
-    private User currentUser;
+    private UserDto currentUser;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,6 +93,7 @@ public class FragmentMyProfile extends Fragment {
         mFullnameTextView = view.findViewById(R.id.frag_user_profile_fullname_textView);
         mUsernameTextView = view.findViewById(R.id.frag_user_profile_username_textView);
         mLogOutButton = view.findViewById(R.id.frag_user_profile_logout_button);
+        mProgressBar = view.findViewById(R.id.frag_user_profile_progress);
 
         mLogOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,18 +107,40 @@ public class FragmentMyProfile extends Fragment {
     }
 
     private void subscribeProfile() {
-        mUserViewModel.userFromDB().observe(this, userResource -> {
-            // TODO: 24.05.2018 INIT PROGRESS BAR
+        mUserViewModel.userFromDB().observe(this, userBDResource -> {
+            mProgressBar.setVisibility(View.VISIBLE);
 
-            if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
-                currentUser = userResource.getData();
+            if (userBDResource != null && userBDResource.getStatus() == NetworkStatus.SUCCESS) {
+                mUserViewModel.getUserById(userBDResource.getData().getId()).observe(this, userDtoResource -> {
 
-                mFullnameTextView.setText(currentUser.getName());
-                mUsernameTextView.setText(currentUser.getUsername());
+                    if (userDtoResource == null) {
+                        Toast.makeText(getActivity(), R.string.received_null_data, Toast.LENGTH_LONG).show();
+                    }
+
+                    switch (userDtoResource.getStatus()) {
+                        case SUCCESS:
+                            currentUser = userDtoResource.getData();
+
+                            mFullnameTextView.setText(currentUser.getName());
+                            mUsernameTextView.setText(currentUser.getUsername());
+
+                            // Set avatar image
+                            if (currentUser.getUserProfile() != null && currentUser.getUserProfile().getAvatarFile() != null) {
+                                setImageWithGlide(currentUser.getUserProfile().getAvatarFile());
+                            }
+                            break;
+                        case ERROR:
+                            Toast.makeText(getActivity(), userDtoResource.getMessage(), Toast.LENGTH_LONG).show();
+                            break;
+                        default:
+                            Toast.makeText(getActivity(), "Unknown status", Toast.LENGTH_LONG).show();
+                    }
+
+
+                });
             }
 
-            // TODO: 24.05.2018 CANCEL PROGRESS BAR
-//            mProgressBar.setVisibility(GONE);
+            mProgressBar.setVisibility(View.GONE);
         });
     }
 
@@ -123,22 +154,22 @@ public class FragmentMyProfile extends Fragment {
                 return;
             }
 
+            mProgressBar.setVisibility(View.VISIBLE);
             FileEntity fileEntity = new FileEntity();
             fileEntity.setFileType(FileType.IMAGE);
 
             File avatarFile = openPath(data.getData());
             if (currentUser != null) {
-                mFileViewModel.uploadAvatar(currentUser.getIdAsUUID(), fileEntity, avatarFile).observe(this, avatarResource -> {
-                    // TODO: 25.05.2018 INIT PROGRESS BAR
+                mFileViewModel.uploadAvatar(currentUser.getId(), fileEntity, avatarFile).observe(this, avatarResource -> {
                     if (avatarResource == null) {
-                        Toast.makeText(getActivity(), "Received null data", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), R.string.received_null_data, Toast.LENGTH_LONG).show();
                         return;
                     }
 
                     switch (avatarResource.getStatus()) {
                         case SUCCESS:
-                            // TODO: 25.05.2018 UPDATE AVATAR IMAGE
                             Toast.makeText(getActivity(), "Ok", Toast.LENGTH_SHORT).show();
+                            setImageWithGlide(avatarResource.getData());
                             break;
                         case ERROR:
                             Toast.makeText(getActivity(), avatarResource.getMessage(), Toast.LENGTH_LONG).show();
@@ -148,20 +179,29 @@ public class FragmentMyProfile extends Fragment {
                     }
 
 
-                    // TODO: 25.05.2018 CANCEL PROGRESS BAR
+
                 });
+
+                mProgressBar.setVisibility(View.GONE);
             }
 
         }
     }
 
+    private void setImageWithGlide(FileEntityDto avatarFile) {
+        GlideApp.with(this)
+                .load(App.BASE_URL + avatarFile.getDataUrl())
+                .fitCenter()
+                .transition(DrawableTransitionOptions.withCrossFade())
+//                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .signature(new ObjectKey(avatarFile.getDataUrl()))
+                .into(mUserAvatarImageView);
+    }
+
     public File openPath(Uri uri){
         File result = new File(getActivity().getFilesDir() + File.separator + "temp");
         try {
-
             InputStream is = getActivity().getContentResolver().openInputStream(uri);
-            //Convert your stream to data here
-
             result.createNewFile();
             FileUtils.copyInputStreamToFile(is, result);
             is.close();

@@ -16,8 +16,8 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 import ru.belogurow.socialnetworkclient.App;
+import ru.belogurow.socialnetworkclient.chat.dto.ChatMessageDto;
 import ru.belogurow.socialnetworkclient.chat.dto.ChatRoomDto;
-import ru.belogurow.socialnetworkclient.chat.model.ChatMessage;
 import ru.belogurow.socialnetworkclient.chat.model.ChatRoom;
 import ru.belogurow.socialnetworkclient.chat.repository.RemoteChatRepository;
 import ru.belogurow.socialnetworkclient.common.web.Resource;
@@ -82,8 +82,10 @@ public class ChatViewModel extends ViewModel {
                                 error -> {
                                     Log.d(TAG, "getAllChatsByUserId-error: " + Arrays.toString(error.getStackTrace()));
 
-                                    if (error instanceof HttpException)
+                                    if (error instanceof HttpException) {
+                                        Log.d(TAG, "getAllChatsByUserId-error: " + (((HttpException) error).response().errorBody()));
                                         chatRoomListResult.postValue(Resource.error(((HttpException) error).response().errorBody()));
+                                    }
                                     else {
                                         chatRoomListResult.postValue(Resource.error(error.getMessage()));
                                     }
@@ -94,10 +96,10 @@ public class ChatViewModel extends ViewModel {
         return chatRoomListResult;
     }
 
-    public LiveData<Resource<List<ChatMessage>>> getAllMessagesByChatId(UUID chatId) {
+    public LiveData<Resource<List<ChatMessageDto>>> getAllMessagesByChatId(UUID chatId) {
         Log.d(TAG, "getAllMessagesByChatId: " + chatId);
 
-        final MutableLiveData<Resource<List<ChatMessage>>> chatMessageListResult = new MutableLiveData<>();
+        final MutableLiveData<Resource<List<ChatMessageDto>>> chatMessageListResult = new MutableLiveData<>();
 
         mCompositeDisposable.add(
                 mRemoteChatRepository.getAllMessagesByChatId(chatId)

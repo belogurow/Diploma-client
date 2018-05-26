@@ -77,7 +77,7 @@ public class FragmentUserList extends Fragment {
     private void initFields(View view) {
         mUsersRecyclerView = view.findViewById(R.id.recycler_frag_user_list);
         mProgressBar = view.findViewById(R.id.progress_frag_user_list);
-        mUsersAdapter = new UsersListAdapter();
+        mUsersAdapter = new UsersListAdapter(view.getContext());
 
         mUsersRecyclerView.setHasFixedSize(true);
         mUsersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

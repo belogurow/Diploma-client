@@ -12,9 +12,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.signature.ObjectKey;
+
+import java.util.UUID;
+
+import ru.belogurow.socialnetworkclient.App;
 import ru.belogurow.socialnetworkclient.R;
+import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
 import ru.belogurow.socialnetworkclient.common.extra.Extras;
-import ru.belogurow.socialnetworkclient.users.model.User;
+import ru.belogurow.socialnetworkclient.common.web.GlideApp;
+import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 
 public class AboutUserActivity extends AppCompatActivity {
@@ -36,9 +44,9 @@ public class AboutUserActivity extends AppCompatActivity {
         initFields();
 
         Intent intent = getIntent();
-        String userId = intent.getStringExtra(Extras.EXTRA_USER_ID);
+        UUID userId = (UUID) intent.getSerializableExtra(Extras.EXTRA_USER_ID);
 
-        Toast.makeText(this, userId, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, userId.toString(), Toast.LENGTH_SHORT).show();
 
 
         mUserViewModel.getUserById(userId).observe(this, userResource -> {
@@ -50,10 +58,16 @@ public class AboutUserActivity extends AppCompatActivity {
             switch (userResource.getStatus()) {
                 case SUCCESS:
                     Toast.makeText(AboutUserActivity.this, userResource.getData().toString(), Toast.LENGTH_LONG).show();
-                    User currentUser = userResource.getData();
+                    UserDto currentUser = userResource.getData();
 
                     mFullnameTextView.setText(currentUser.getName());
                     mUsernameTextView.setText(currentUser.getUsername());
+
+
+                    // Set avatar image
+                    if (currentUser.getUserProfile() != null && currentUser.getUserProfile().getAvatarFile() != null) {
+                        setImageWithGlide(currentUser.getUserProfile().getAvatarFile());
+                    }
 
                     break;
                 case ERROR:
@@ -90,6 +104,16 @@ public class AboutUserActivity extends AppCompatActivity {
         }
 
         mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+    }
+
+    private void setImageWithGlide(FileEntityDto avatarFile) {
+        GlideApp.with(this)
+                .load(App.BASE_URL + avatarFile.getDataUrl())
+                .fitCenter()
+                .transition(DrawableTransitionOptions.withCrossFade())
+//                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .signature(new ObjectKey(avatarFile.getDataUrl()))
+                .into(mUserAvatarImageView);
     }
 
     @Override

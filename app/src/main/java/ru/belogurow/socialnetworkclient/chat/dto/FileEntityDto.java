@@ -4,12 +4,13 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
 import ru.belogurow.socialnetworkclient.chat.model.FileType;
 
-public class FileEntityDto {
+public class FileEntityDto implements Serializable{
 
     private UUID id;
 

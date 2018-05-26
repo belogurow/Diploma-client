@@ -17,7 +17,9 @@ import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 import ru.belogurow.socialnetworkclient.App;
 import ru.belogurow.socialnetworkclient.common.web.Resource;
+import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 import ru.belogurow.socialnetworkclient.users.model.User;
+import ru.belogurow.socialnetworkclient.users.model.UserRole;
 import ru.belogurow.socialnetworkclient.users.repository.LocalUserRepository;
 import ru.belogurow.socialnetworkclient.users.repository.RemoteUserRepository;
 
@@ -29,8 +31,8 @@ public class UserViewModel extends ViewModel {
 
     private static final String TAG = UserViewModel.class.getSimpleName();
 
-    private MutableLiveData<Resource<List<User>>> allUsers;
-    private MutableLiveData<Resource<User>> currentUser;
+    private MutableLiveData<Resource<List<UserDto>>> allUsers;
+    private MutableLiveData<Resource<UserDto>> currentUser;
 
     @Inject
     protected RemoteUserRepository mRemoteUserRepository;
@@ -50,7 +52,7 @@ public class UserViewModel extends ViewModel {
         mLocalUserRepository.deleteAll();
     }
 
-    public LiveData<Resource<User>> userFromDB() {
+    public LiveData<Resource<UserDto>> userFromDB() {
         Log.d(TAG, "userFromDB: ");
 
         if (currentUser == null) {
@@ -63,7 +65,7 @@ public class UserViewModel extends ViewModel {
                             .subscribe(
                                     userResult -> {
                                         Log.d(TAG, "userFromDB-result: " + userResult.toString());
-                                        currentUser.postValue(Resource.success(userResult));
+                                        currentUser.postValue(Resource.success(convertUser2UserDto(userResult)));
                                     },
                                     error -> {
                                         Log.d(TAG, "userFromDB-error:" + Arrays.toString(error.getStackTrace()));
@@ -80,10 +82,10 @@ public class UserViewModel extends ViewModel {
         return currentUser;
     }
 
-    public LiveData<Resource<User>> login(User user) {
+    public LiveData<Resource<UserDto>> login(User user) {
         Log.d(TAG, "login: " + user.toString());
 
-        final MutableLiveData<Resource<User>> liveData = new MutableLiveData<>();
+        final MutableLiveData<Resource<UserDto>> liveData = new MutableLiveData<>();
         mCompositeDisposable.add(
                 mRemoteUserRepository.login(user)
                         .subscribeOn(Schedulers.io())
@@ -93,7 +95,7 @@ public class UserViewModel extends ViewModel {
                                 Log.d(TAG, "loginRx-result: " + userResult.toString());
                                 liveData.postValue(Resource.success(userResult));
 
-                                mLocalUserRepository.insert(userResult);
+                                mLocalUserRepository.insert(convertUserDto2User(userResult));
                             },
                             error -> {
                                 Log.d(TAG, "login-error:" + error.getMessage());
@@ -109,10 +111,10 @@ public class UserViewModel extends ViewModel {
         return liveData;
     }
 
-    public LiveData<Resource<User>> registration(User user) {
+    public LiveData<Resource<UserDto>> registration(User user) {
         Log.d(TAG, "registration: " + user.toString());
 
-        final MutableLiveData<Resource<User>> liveData = new MutableLiveData<>();
+        final MutableLiveData<Resource<UserDto>> liveData = new MutableLiveData<>();
         mCompositeDisposable.add(
                 mRemoteUserRepository.registration(user)
                         .subscribeOn(Schedulers.io())
@@ -122,7 +124,7 @@ public class UserViewModel extends ViewModel {
                                     Log.d(TAG, "registrationRx-result: " + userResult.toString());
                                     liveData.postValue(Resource.success(userResult));
 
-                                    mLocalUserRepository.insert(userResult);
+                                    mLocalUserRepository.insert(convertUserDto2User(userResult));
                                 },
                                 error -> {
                                     Log.d(TAG, "registration-error:" + error.getMessage());
@@ -138,7 +140,7 @@ public class UserViewModel extends ViewModel {
         return liveData;
     }
 
-    public LiveData<Resource<List<User>>> getAllUsers() {
+    public LiveData<Resource<List<UserDto>>> getAllUsers() {
         Log.d(TAG, "getAllUsers: ");
 
         if (allUsers == null) {
@@ -168,12 +170,12 @@ public class UserViewModel extends ViewModel {
         return allUsers;
     }
 
-    public LiveData<Resource<User>> getUserById(String id) {
+    public LiveData<Resource<UserDto>> getUserById(UUID id) {
         Log.d(TAG, "getUserById: " + id);
 
-        final MutableLiveData<Resource<User>> liveData = new MutableLiveData<>();
+        final MutableLiveData<Resource<UserDto>> liveData = new MutableLiveData<>();
         mCompositeDisposable.add(
-                mRemoteUserRepository.getUserById(UUID.fromString(id))
+                mRemoteUserRepository.getUserById(id)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -193,6 +195,31 @@ public class UserViewModel extends ViewModel {
         );
 
         return liveData;
+    }
+
+    private User convertUserDto2User(UserDto userDto) {
+        User user = new User();
+
+        user.setId(userDto.getId().toString());
+        user.setName(userDto.getName());
+        user.setUsername(userDto.getUsername());
+        user.setPassword(userDto.getPassword());
+        user.setUserRole(userDto.getUserRole().toString());
+
+        return user;
+    }
+
+    private UserDto convertUser2UserDto(User user) {
+        UserDto userDto = new UserDto();
+
+        userDto.setId(UUID.fromString(user.getId()));
+        userDto.setName(user.getName());
+        userDto.setUsername(user.getUsername());
+        userDto.setPassword(user.getPassword());
+        userDto.setUserRole(UserRole.valueOf(user.getUserRole()));
+        userDto.setUserProfile(null);
+
+        return userDto;
     }
 
     @Override

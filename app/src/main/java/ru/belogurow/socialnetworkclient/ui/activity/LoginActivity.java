@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.common.web.Resource;
+import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 import ru.belogurow.socialnetworkclient.users.model.User;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 
@@ -27,7 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputLayout mTextInputPassword;
     private ProgressBar mProgressBarLogin;
 
-    private Observer<Resource<User>> loginObserver;
+    private Observer<Resource<UserDto>> loginObserver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

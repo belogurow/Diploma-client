@@ -8,6 +8,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 import ru.belogurow.socialnetworkclient.users.model.User;
 
 /**
@@ -16,14 +17,14 @@ import ru.belogurow.socialnetworkclient.users.model.User;
 
 public interface UserWebService {
     @POST("/login")
-    Flowable<User> login(@Body User user);
+    Flowable<UserDto> login(@Body User user);
 
     @POST("/registration")
-    Flowable<User> registration(@Body User user);
+    Flowable<UserDto> registration(@Body User user);
 
     @GET("/users/{id}")
-    Flowable<User> getUserById(@Path("id") UUID id);
+    Flowable<UserDto> getUserById(@Path("id") UUID id);
 
     @GET("users")
-    Flowable<List<User>> getUsers();
+    Flowable<List<UserDto>> getUsers();
 }
