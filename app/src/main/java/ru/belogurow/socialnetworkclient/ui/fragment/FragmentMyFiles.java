@@ -81,9 +81,10 @@ public class FragmentMyFiles extends Fragment {
     public void onStart() {
         super.onStart();
 
-
+        // TODO: 28.05.2018 GLIDE загружает фото не в те позиции 
+//        mFilesAdapter.setFileEntityDtos(new LinkedList<>());
         mUserViewModel.userFromDB().observe(this, userDtoResource -> {
-            mProgressBar.setVisibility(View.VISIBLE);
+            showProgressBar();
 
             if (userDtoResource != null && userDtoResource.getStatus() == NetworkStatus.SUCCESS) {
                 currentUser = userDtoResource.getData();
@@ -91,6 +92,7 @@ public class FragmentMyFiles extends Fragment {
                 mFileViewModel.getAllFilesByUserId(currentUser.getId()).observe(this, fileResource -> {
                     if (fileResource == null) {
                         Toast.makeText(getContext(), R.string.received_null_data, Toast.LENGTH_LONG).show();
+                        hideProgressBar();
                         return;
                     }
 
@@ -109,11 +111,18 @@ public class FragmentMyFiles extends Fragment {
                             Toast.makeText(getContext(), R.string.unknown_status, Toast.LENGTH_LONG).show();
                     }
 
+                    hideProgressBar();
                 });
             }
-
-            mProgressBar.setVisibility(View.GONE);
         });
 
+    }
+
+    private void showProgressBar() {
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        mProgressBar.setVisibility(View.GONE);
     }
 }

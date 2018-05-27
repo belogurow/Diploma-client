@@ -6,4 +6,7 @@
 
     <color name="chatRoom_myMessage">@color/md_light_blue_50</color>
     <color name="chatRoom_anotherMessage">@color/md_lime_50</color>
+
+    <color name="secondary_text">@color/material_drawer_secondary_text</color>
+    <color name="primary_text">@color/material_drawer_primary_text</color>
 </resources>

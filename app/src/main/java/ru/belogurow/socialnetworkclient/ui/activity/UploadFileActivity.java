@@ -4,9 +4,16 @@ import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.File;
@@ -27,6 +34,13 @@ public class UploadFileActivity extends AppCompatActivity {
     private FileViewModel mFileViewModel;
 
     private Button mPickFileButton;
+    private Button mUploadButton;
+    private Spinner mFileTypeSpinner;
+    private TextInputLayout mTitleTextInput;
+    private ProgressBar mProgressBar;
+    private Toolbar mToolbar;
+
+    private File choosenFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,23 +50,114 @@ public class UploadFileActivity extends AppCompatActivity {
         initFields();
 
 
-        mPickFileButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent chooserIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                chooserIntent.setType("*/*");
-                chooserIntent = Intent.createChooser(chooserIntent, getString(R.string.pick_file));
+        mPickFileButton.setOnClickListener(v -> {
+            Intent chooserIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            chooserIntent.setType("*/*");
+            chooserIntent = Intent.createChooser(chooserIntent, getString(R.string.pick_file));
 
-                startActivityForResult(chooserIntent, PICK_FILE);
+            startActivityForResult(chooserIntent, PICK_FILE);
+        });
+
+        mUploadButton.setOnClickListener(v -> {
+            if (validateFields()) {
+                uploadFile();
             }
         });
     }
 
     private void initFields() {
         mPickFileButton = findViewById(R.id.act_upload_file_pick_file_button);
+        mTitleTextInput = findViewById(R.id.act_upload_file_title_input);
+
+        mProgressBar = findViewById(R.id.act_upload_file_progress);
+        hideProgressBar();
+
+        mFileTypeSpinner = findViewById(R.id.act_upload_file_type_spinner);
+        ArrayAdapter<String> fileTypesAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, FileType.getTypes());
+        mFileTypeSpinner.setAdapter(fileTypesAdapter);
+
+        mUploadButton = findViewById(R.id.act_upload_file_upload_button);
+        mUploadButton.setEnabled(false);
+
+        mToolbar = findViewById(R.id.act_upload_file_toolbar);
+        setSupportActionBar(mToolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(R.string.upload_file);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
         mFileViewModel = ViewModelProviders.of(this).get(FileViewModel.class);
+    }
+
+    private void hideProgressBar() {
+        mProgressBar.setVisibility(View.GONE);
+    }
+
+    private void showProgressBar() {
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private boolean validateFields() {
+        EditText mTitleEditText = mTitleTextInput.getEditText();
+
+        String emptyField = getString(R.string.empty_field);
+
+        if (mTitleEditText != null) {
+            if (mTitleEditText.getText().length() == 0) {
+                mTitleTextInput.setError(emptyField);
+                return false;
+            } else {
+                mTitleTextInput.setErrorEnabled(false);
+            }
+        }
+
+        if (choosenFile != null) {
+            if (!choosenFile.exists()) {
+                Toast.makeText(this, "File doesn't exists", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        } else {
+            Toast.makeText(this, "Pick a file", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    }
+
+    private void uploadFile() {
+        FileEntity fileEntity = new FileEntity();
+        fileEntity.setFileType(FileType.valueOf(mFileTypeSpinner.getSelectedItem().toString()));
+        fileEntity.setTitle(mTitleTextInput.getEditText().getText().toString());
+
+        mUserViewModel.userFromDB().observe(this, userBDResource -> {
+            showProgressBar();
+
+            if (userBDResource != null && userBDResource.getStatus() == NetworkStatus.SUCCESS) {
+                fileEntity.setAuthorId(userBDResource.getData().getId());
+                mFileViewModel.uploadFile(fileEntity, choosenFile, false).observe(this, fileEntityDtoResource -> {
+                    if (fileEntityDtoResource == null) {
+                        Toast.makeText(this, R.string.received_null_data, Toast.LENGTH_LONG).show();
+                        hideProgressBar();
+                        return;
+                    }
+
+                    switch (fileEntityDtoResource.getStatus()) {
+                        case SUCCESS:
+                            Toast.makeText(this, R.string.successful_upload, Toast.LENGTH_SHORT).show();
+                            break;
+                        case ERROR:
+                            Toast.makeText(this, fileEntityDtoResource.getMessage(), Toast.LENGTH_LONG).show();
+                            break;
+                        default:
+                            Toast.makeText(this, R.string.unknown_status, Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                hideProgressBar();
+            }
+        });
     }
 
     @Override
@@ -60,45 +165,25 @@ public class UploadFileActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PICK_FILE && resultCode == Activity.RESULT_OK) {
-            if (data == null) {
+            if (data == null ) {
                 Toast.makeText(this, R.string.cannot_pick_file, Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            choosenFile = FileUtils.openPath(this, data.getData());
+            mUploadButton.setEnabled(true);
 
-            FileEntity fileEntity = new FileEntity();
-            fileEntity.setFileType(FileType.PDF);
-            fileEntity.setTitle("TODO get title");
-
-            File pickedFile = FileUtils.openPath(this, data.getData());
-
-            mUserViewModel.userFromDB().observe(this, userBDResource -> {
-                // TODO: 27.05.2018 INIT PROGRESS BAR
-//                mProgressBar.setVisibility(View.VISIBLE);
-
-                if (userBDResource != null && userBDResource.getStatus() == NetworkStatus.SUCCESS) {
-                    fileEntity.setAuthorId(userBDResource.getData().getId());
-                    mFileViewModel.uploadFile(fileEntity, pickedFile, false).observe(this, fileEntityDtoResource -> {
-                        if (fileEntityDtoResource == null) {
-                            Toast.makeText(this, R.string.received_null_data, Toast.LENGTH_LONG).show();
-                            return;
-                        }
-
-                        switch (fileEntityDtoResource.getStatus()) {
-                            case SUCCESS:
-                                Toast.makeText(this, R.string.successful_upload, Toast.LENGTH_SHORT).show();
-                                break;
-                            case ERROR:
-                                Toast.makeText(this, fileEntityDtoResource.getMessage(), Toast.LENGTH_LONG).show();
-                                break;
-                            default:
-                                Toast.makeText(this, R.string.unknown_status, Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                }
-                // TODO: 27.05.2018 CLOSE PROGRESS BAR
-            });
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Finish activity when press back button
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

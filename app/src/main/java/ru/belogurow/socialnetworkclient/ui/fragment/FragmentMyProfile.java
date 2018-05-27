@@ -104,13 +104,15 @@ public class FragmentMyProfile extends Fragment {
 
     private void subscribeProfile() {
         mUserViewModel.userFromDB().observe(this, userBDResource -> {
-            mProgressBar.setVisibility(View.VISIBLE);
+           showProgressBar();
 
             if (userBDResource != null && userBDResource.getStatus() == NetworkStatus.SUCCESS) {
                 mUserViewModel.getUserById(userBDResource.getData().getId()).observe(this, userDtoResource -> {
 
                     if (userDtoResource == null) {
                         Toast.makeText(getActivity(), R.string.received_null_data, Toast.LENGTH_LONG).show();
+                        hideProgressBar();
+                        return;
                     }
 
                     switch (userDtoResource.getStatus()) {
@@ -132,11 +134,9 @@ public class FragmentMyProfile extends Fragment {
                             Toast.makeText(getActivity(), R.string.unknown_status, Toast.LENGTH_LONG).show();
                     }
 
-
+                    hideProgressBar();
                 });
             }
-
-            mProgressBar.setVisibility(View.GONE);
         });
     }
 
@@ -150,23 +150,20 @@ public class FragmentMyProfile extends Fragment {
                 return;
             }
 
-            mProgressBar.setVisibility(View.VISIBLE);
-            FileEntity fileEntity = new FileEntity();
-            fileEntity.setFileType(FileType.IMAGE);
-            fileEntity.setTitle("Avatar");
-            fileEntity.setAuthorId(currentUser.getId());
+            showProgressBar();
 
             File avatarFile = FileUtils.openPath(getContext(), data.getData());
             if (currentUser != null) {
-                mFileViewModel.uploadAvatar(currentUser.getId(), fileEntity, avatarFile).observe(this, avatarResource -> {
+                mFileViewModel.uploadFile(createFileEntity(), avatarFile, true).observe(this, avatarResource -> {
                     if (avatarResource == null) {
                         Toast.makeText(getActivity(), R.string.received_null_data, Toast.LENGTH_LONG).show();
+                        hideProgressBar();
                         return;
                     }
 
                     switch (avatarResource.getStatus()) {
                         case SUCCESS:
-                            Toast.makeText(getActivity(), "Ok", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), R.string.successful_upload, Toast.LENGTH_SHORT).show();
                             setImageWithGlide(avatarResource.getData());
                             break;
                         case ERROR:
@@ -177,12 +174,10 @@ public class FragmentMyProfile extends Fragment {
                     }
 
 
-
+                    hideProgressBar();
                 });
 
             }
-            mProgressBar.setVisibility(View.GONE);
-
         }
     }
 
@@ -194,5 +189,23 @@ public class FragmentMyProfile extends Fragment {
 //                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .signature(new ObjectKey(avatarFile.getDataUrl()))
                 .into(mUserAvatarImageView);
+    }
+
+    private FileEntity createFileEntity() {
+        FileEntity fileEntity = new FileEntity();
+
+        fileEntity.setFileType(FileType.JPG);
+        fileEntity.setTitle("Avatar");
+        fileEntity.setAuthorId(currentUser.getId());
+
+        return fileEntity;
+    }
+
+    private void showProgressBar() {
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        mProgressBar.setVisibility(View.GONE);
     }
 }

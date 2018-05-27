@@ -41,5 +41,8 @@
     <string name="pick_file">Pick file</string>
     <string name="cannot_pick_file">Cannot pick file</string>
     <string name="successful_upload">Successful</string>
+    <string name="upload">Upload</string>
+    <string name="title">Title</string>
+    <string name="upload_file">Upload file</string>
 
 </resources>
