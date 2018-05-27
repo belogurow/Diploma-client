@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -51,6 +52,62 @@ public class FileViewModel  extends ViewModel {
                                 },
                                 error -> {
                                     Log.d(TAG, "uploadAvatar-error: " + error.toString());
+
+                                    if (error instanceof HttpException)
+                                        resourceMutableLiveData.postValue(Resource.error(((HttpException) error).response().errorBody()));
+                                    else {
+                                        resourceMutableLiveData.postValue(Resource.error(error.getMessage()));
+                                    }
+                                })
+        );
+
+        return resourceMutableLiveData;
+    }
+
+    public LiveData<Resource<FileEntityDto>> uploadFile(FileEntity fileEntity, File file, boolean isAvatar) {
+        Log.d(TAG, "uploadFile: " + fileEntity);
+
+        final MutableLiveData<Resource<FileEntityDto>> resourceMutableLiveData = new MutableLiveData<>();
+
+        mCompositeDisposable.add(
+                mRemoteFileRepository.uploadFile(fileEntity, file, isAvatar)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                fileResource -> {
+                                    Log.d(TAG, "uploadFile-result: " + fileResource);
+                                    resourceMutableLiveData.postValue(Resource.success(fileResource));
+                                },
+                                error -> {
+                                    Log.d(TAG, "uploadFile-error: " + error.toString());
+
+                                    if (error instanceof HttpException)
+                                        resourceMutableLiveData.postValue(Resource.error(((HttpException) error).response().errorBody()));
+                                    else {
+                                        resourceMutableLiveData.postValue(Resource.error(error.getMessage()));
+                                    }
+                                })
+        );
+
+        return resourceMutableLiveData;
+    }
+
+    public LiveData<Resource<List<FileEntityDto>>> getAllFilesByUserId(UUID userId) {
+        Log.d(TAG, "getAllFilesByUserId: " + userId);
+
+        final MutableLiveData<Resource<List<FileEntityDto>>> resourceMutableLiveData = new MutableLiveData<>();
+
+        mCompositeDisposable.add(
+                mRemoteFileRepository.getAllFilesByUserId(userId)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                dataResource -> {
+                                    Log.d(TAG, "getAllFilesByUserId-result: " + dataResource);
+                                    resourceMutableLiveData.postValue(Resource.success(dataResource));
+                                },
+                                error -> {
+                                    Log.d(TAG, "getAllFilesByUserId-error: " + error.toString());
 
                                     if (error instanceof HttpException)
                                         resourceMutableLiveData.postValue(Resource.error(((HttpException) error).response().errorBody()));

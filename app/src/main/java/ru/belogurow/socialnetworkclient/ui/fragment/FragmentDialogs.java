@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.chat.viewModel.ChatViewModel;
@@ -64,13 +65,29 @@ public class FragmentDialogs extends Fragment {
                 currentUser = userResource.getData();
 
                 mChatViewModel.getAllChatsByUserId(currentUser.getId()).observe(this, chatResource -> {
-                    if (chatResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
-                        mDialogsAdapter.setChatList(chatResource.getData());
-                        mDialogsAdapter.setCurrentUser(currentUser);
+                    if (chatResource == null) {
+                        Toast.makeText(getContext(), R.string.received_null_data, Toast.LENGTH_LONG).show();
+                        return;
                     }
+
+                    switch (chatResource.getStatus()) {
+                        case SUCCESS:
+                            if (chatResource.getData().isEmpty()) {
+                                Toast.makeText(getContext(), R.string.list_is_empty, Toast.LENGTH_SHORT).show();
+                            } else {
+                                mDialogsAdapter.setChatList(chatResource.getData());
+                                mDialogsAdapter.setCurrentUser(currentUser);
+                            }
+                            break;
+                        case ERROR:
+                            Toast.makeText(getContext(), chatResource.getMessage(), Toast.LENGTH_LONG).show();
+                            break;
+                        default:
+                            Toast.makeText(getContext(), R.string.unknown_status, Toast.LENGTH_LONG).show();
+                    }
+
                 });
             }
-
             mProgressBar.setVisibility(GONE);
         });
 

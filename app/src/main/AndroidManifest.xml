@@ -35,6 +35,8 @@
         </activity>
         <activity android:name=".ui.activity.ChatRoomActivity">
         </activity>
+        <activity android:name=".ui.activity.UploadFileActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -49,6 +49,7 @@ public class AboutUserActivity extends AppCompatActivity {
         Toast.makeText(this, userId.toString(), Toast.LENGTH_SHORT).show();
 
 
+        // TODO: 27.05.2018 SHOW PROGRESS BAR
         mUserViewModel.getUserById(userId).observe(this, userResource -> {
             if (userResource == null) {
                 Toast.makeText(AboutUserActivity.this, "Received null data", Toast.LENGTH_LONG).show();

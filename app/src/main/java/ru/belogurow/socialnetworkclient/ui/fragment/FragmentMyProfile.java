@@ -3,7 +3,6 @@ package ru.belogurow.socialnetworkclient.ui.fragment;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,12 +19,7 @@ import android.widget.Toast;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.signature.ObjectKey;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 
 import ru.belogurow.socialnetworkclient.App;
 import ru.belogurow.socialnetworkclient.R;
@@ -33,6 +27,7 @@ import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
 import ru.belogurow.socialnetworkclient.chat.model.FileEntity;
 import ru.belogurow.socialnetworkclient.chat.model.FileType;
 import ru.belogurow.socialnetworkclient.chat.viewModel.FileViewModel;
+import ru.belogurow.socialnetworkclient.common.file.FileUtils;
 import ru.belogurow.socialnetworkclient.common.web.GlideApp;
 import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
 import ru.belogurow.socialnetworkclient.ui.activity.LoginActivity;
@@ -63,8 +58,6 @@ public class FragmentMyProfile extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_my_profile, container, false);
-        mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
-        mFileViewModel = ViewModelProviders.of(this).get(FileViewModel.class);
 
         initFields(view);
         subscribeProfile();
@@ -94,6 +87,9 @@ public class FragmentMyProfile extends Fragment {
         mUsernameTextView = view.findViewById(R.id.frag_user_profile_username_textView);
         mLogOutButton = view.findViewById(R.id.frag_user_profile_logout_button);
         mProgressBar = view.findViewById(R.id.frag_user_profile_progress);
+
+        mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+        mFileViewModel = ViewModelProviders.of(this).get(FileViewModel.class);
 
         mLogOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,7 +129,7 @@ public class FragmentMyProfile extends Fragment {
                             Toast.makeText(getActivity(), userDtoResource.getMessage(), Toast.LENGTH_LONG).show();
                             break;
                         default:
-                            Toast.makeText(getActivity(), "Unknown status", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), R.string.unknown_status, Toast.LENGTH_LONG).show();
                     }
 
 
@@ -157,8 +153,10 @@ public class FragmentMyProfile extends Fragment {
             mProgressBar.setVisibility(View.VISIBLE);
             FileEntity fileEntity = new FileEntity();
             fileEntity.setFileType(FileType.IMAGE);
+            fileEntity.setTitle("Avatar");
+            fileEntity.setAuthorId(currentUser.getId());
 
-            File avatarFile = openPath(data.getData());
+            File avatarFile = FileUtils.openPath(getContext(), data.getData());
             if (currentUser != null) {
                 mFileViewModel.uploadAvatar(currentUser.getId(), fileEntity, avatarFile).observe(this, avatarResource -> {
                     if (avatarResource == null) {
@@ -175,15 +173,15 @@ public class FragmentMyProfile extends Fragment {
                             Toast.makeText(getActivity(), avatarResource.getMessage(), Toast.LENGTH_LONG).show();
                             break;
                         default:
-                            Toast.makeText(getActivity(), "Unknown status", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), R.string.unknown_status, Toast.LENGTH_LONG).show();
                     }
 
 
 
                 });
 
-                mProgressBar.setVisibility(View.GONE);
             }
+            mProgressBar.setVisibility(View.GONE);
 
         }
     }
@@ -196,23 +194,5 @@ public class FragmentMyProfile extends Fragment {
 //                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .signature(new ObjectKey(avatarFile.getDataUrl()))
                 .into(mUserAvatarImageView);
-    }
-
-    public File openPath(Uri uri){
-        File result = new File(getActivity().getFilesDir() + File.separator + "temp");
-        try {
-            InputStream is = getActivity().getContentResolver().openInputStream(uri);
-            result.createNewFile();
-            FileUtils.copyInputStreamToFile(is, result);
-            is.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        return result;
     }
 }

@@ -13,9 +13,7 @@ import ru.belogurow.socialnetworkclient.chat.model.FileType;
 public class FileEntityDto implements Serializable{
 
     private UUID id;
-
-//    private UUID authorId;
-
+    private UUID authorId;
     private String title;
     private String dataUrl;
     private Date updateTime;
@@ -64,15 +62,12 @@ public class FileEntityDto implements Serializable{
         this.fileType = fileType;
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("id", id)
-                .append("title", title)
-                .append("dataUrl", dataUrl)
-                .append("updateTime", updateTime)
-                .append("fileType", fileType)
-                .toString();
+    public UUID getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(UUID authorId) {
+        this.authorId = authorId;
     }
 
     @Override
@@ -85,6 +80,7 @@ public class FileEntityDto implements Serializable{
 
         return new EqualsBuilder()
                 .append(id, that.id)
+                .append(authorId, that.authorId)
                 .append(title, that.title)
                 .append(dataUrl, that.dataUrl)
                 .append(updateTime, that.updateTime)
@@ -96,10 +92,23 @@ public class FileEntityDto implements Serializable{
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(id)
+                .append(authorId)
                 .append(title)
                 .append(dataUrl)
                 .append(updateTime)
                 .append(fileType)
                 .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("authorId", authorId)
+                .append("title", title)
+                .append("dataUrl", dataUrl)
+                .append("updateTime", updateTime)
+                .append("fileType", fileType)
+                .toString();
     }
 }

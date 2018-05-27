@@ -30,6 +30,7 @@ import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
 import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentChat;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentDialogs;
+import ru.belogurow.socialnetworkclient.ui.fragment.FragmentMyFiles;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentMyProfile;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentUserList;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentUserProfile;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private Fragment fragmentUserProfile;
     private Fragment fragmentMyProfile;
     private Fragment fragmentDialogs;
+    private Fragment fragmentMyFiles;
     private Fragment fragmentWebSocketTest;
 
     private ProfileDrawerItem mProfileDrawerItem;
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentUserProfile = new FragmentUserProfile();
         fragmentMyProfile = new FragmentMyProfile();
         fragmentDialogs = new FragmentDialogs();
+        fragmentMyFiles = new FragmentMyFiles();
 
         fragmentWebSocketTest = new FragmentChat();
 
@@ -166,6 +169,17 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 });
 
+        PrimaryDrawerItem files = new PrimaryDrawerItem()
+                .withIdentifier(3)
+                .withName(R.string.my_files)
+                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                    mToolbar.setTitle(R.string.my_files);
+                    navigationSelectedItem = 3;
+                    openFragment();
+
+                    return false;
+                });
+
         SecondaryDrawerItem elseItem = new SecondaryDrawerItem()
                 .withIdentifier(3)
                 .withName(R.string.else_field)
@@ -200,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
                         myProfile,
                         users,
                         dialogs,
+                        files,
                         new DividerDrawerItem(),
                         websocketItem
                 )
@@ -230,10 +245,10 @@ public class MainActivity extends AppCompatActivity {
                         .addToBackStack("DIALOGS")
                         .commit();
                 break;
-            case 4:
+            case 3:
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_acitivity_container, fragmentWebSocketTest)
-                        .addToBackStack("WEB_SOCKET")
+                        .replace(R.id.main_acitivity_container, fragmentMyFiles)
+                        .addToBackStack("MY_FILES")
                         .commit();
                 break;
             default:

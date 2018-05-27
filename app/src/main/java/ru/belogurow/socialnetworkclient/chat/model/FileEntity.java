@@ -10,21 +10,13 @@ import java.util.UUID;
 public class FileEntity {
 
     private UUID id;
-
-//    private UUID authorId;
+    private UUID authorId;
     private String title;
     private byte[] data;
     private Date updateTime;
     private FileType fileType;
 
     public FileEntity() {
-    }
-
-    public FileEntity(String title, byte[] data, Date updateTime, FileType fileType) {
-        this.title = title;
-        this.data = data;
-        this.updateTime = updateTime;
-        this.fileType = fileType;
     }
 
 
@@ -68,10 +60,19 @@ public class FileEntity {
         this.fileType = fileType;
     }
 
+    public UUID getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(UUID authorId) {
+        this.authorId = authorId;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("id", id)
+                .append("authorId", authorId)
                 .append("title", title)
                 .append("data", data)
                 .append("updateTime", updateTime)
@@ -89,6 +90,7 @@ public class FileEntity {
 
         return new EqualsBuilder()
                 .append(id, that.id)
+                .append(authorId, that.authorId)
                 .append(title, that.title)
                 .append(data, that.data)
                 .append(updateTime, that.updateTime)
@@ -100,6 +102,7 @@ public class FileEntity {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(id)
+                .append(authorId)
                 .append(title)
                 .append(data)
                 .append(updateTime)
