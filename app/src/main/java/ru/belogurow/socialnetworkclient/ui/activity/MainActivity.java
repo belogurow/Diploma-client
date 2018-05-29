@@ -67,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
         initFragments();
         initDrawer();
         subscribeProfile();
+
+//        startActivity(new Intent(this, StlViewerActivity.class));
     }
 
     private void initFragments() {

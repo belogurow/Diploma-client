@@ -1,5 +1,6 @@
 package ru.belogurow.socialnetworkclient.ui.adapter;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,7 +21,9 @@ import ru.belogurow.socialnetworkclient.App;
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
 import ru.belogurow.socialnetworkclient.chat.model.FileType;
+import ru.belogurow.socialnetworkclient.common.extra.Extras;
 import ru.belogurow.socialnetworkclient.common.web.GlideApp;
+import ru.belogurow.socialnetworkclient.ui.activity.StlViewerActivity;
 
 public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder> {
 
@@ -31,7 +34,7 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private ImageView mFilePreviewImageView;
         private TextView mTitleTextView;
         private TextView mDateTextView;
@@ -44,6 +47,19 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder> 
             mTitleTextView = itemView.findViewById(R.id.item_file_title_text);
             mDateTextView = itemView.findViewById(R.id.item_file_date_text);
             mFileTypeTextView = itemView.findViewById(R.id.item_file_type_text);
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getLayoutPosition();
+
+            if (mFileEntityDtos.get(position).getFileType().equals(FileType.STL)) {
+                Intent aboutFileActivity = new Intent(v.getContext(), StlViewerActivity.class);
+                aboutFileActivity.putExtra(Extras.EXTRA_FILE_ENTITY_DTO, mFileEntityDtos.get(position));
+                v.getContext().startActivity(aboutFileActivity);
+            }
         }
     }
 
@@ -63,19 +79,23 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder> 
         holder.mDateTextView.setText(dateFormat.format(fileEntityDto.getUpdateTime()));
         holder.mFileTypeTextView.setText(fileEntityDto.getFileType().toString());
 
-        if (fileEntityDto.getFileType().equals(FileType.JPG)) {
-            setImageWithGlide(holder, fileEntityDto);
-        }
+        setImageWithGlide(holder, fileEntityDto);
     }
 
-    private void setImageWithGlide(ViewHolder viewHolder, FileEntityDto avatarFile) {
-        GlideApp.with(viewHolder.itemView.getContext())
-                .load(App.BASE_URL + avatarFile.getDataUrl())
-                .fitCenter()
-                .transition(DrawableTransitionOptions.withCrossFade())
+    private void setImageWithGlide(ViewHolder viewHolder, FileEntityDto file) {
+        viewHolder.mFilePreviewImageView.setImageDrawable(
+                viewHolder.itemView.getContext().getResources().getDrawable(R.drawable.file_icon));
+
+        if (file.getFileType().equals(FileType.JPG)) {
+            GlideApp.with(viewHolder.itemView.getContext())
+                    .load(App.BASE_URL + file.getDataUrl())
+                    .fitCenter()
+                    .transition(DrawableTransitionOptions.withCrossFade())
 //                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .signature(new ObjectKey(avatarFile.getDataUrl()))
-                .into(viewHolder.mFilePreviewImageView);
+                    .signature(new ObjectKey(file.getDataUrl()))
+                    .error(R.drawable.file_icon)
+                    .into(viewHolder.mFilePreviewImageView);
+        }
     }
 
     @Override

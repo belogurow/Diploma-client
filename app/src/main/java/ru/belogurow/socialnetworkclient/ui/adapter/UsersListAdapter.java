@@ -86,6 +86,9 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
 
     private void setImageWithGlide(FileEntityDto avatarFile, ViewHolder viewHolder) {
         GlideApp.with(mContext)
+                .clear(viewHolder.mUserAvatarImageView);
+
+        GlideApp.with(mContext)
                 .load(App.BASE_URL + avatarFile.getDataUrl())
                 .fitCenter()
                 .transition(DrawableTransitionOptions.withCrossFade())

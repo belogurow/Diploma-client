@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import io.reactivex.Flowable;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -31,5 +33,8 @@ public interface FileWebService {
 
     @GET("/files")
     Flowable<List<FileEntityDto>> getAllFilesByUserId(@Query("userId") UUID userId);
+
+    @GET("/file/{fileId}")
+    Call<ResponseBody> getFileById(@Path("fileId") UUID fileId);
 
 }

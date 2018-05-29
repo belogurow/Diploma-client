@@ -44,5 +44,9 @@
     <string name="upload">Upload</string>
     <string name="title">Title</string>
     <string name="upload_file">Upload file</string>
+    <string name="dialog_file_upload_title">File successfully uploaded</string>
+    <string name="dialog_file_upload_message">Add a new one?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 </resources>

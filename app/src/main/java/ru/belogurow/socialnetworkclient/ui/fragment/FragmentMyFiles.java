@@ -81,7 +81,6 @@ public class FragmentMyFiles extends Fragment {
     public void onStart() {
         super.onStart();
 
-        // TODO: 28.05.2018 GLIDE загружает фото не в те позиции 
 //        mFilesAdapter.setFileEntityDtos(new LinkedList<>());
         mUserViewModel.userFromDB().observe(this, userDtoResource -> {
             showProgressBar();

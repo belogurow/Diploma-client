@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -48,6 +49,7 @@ public class UploadFileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_upload_file);
 
         initFields();
+        clearFields();
 
 
         mPickFileButton.setOnClickListener(v -> {
@@ -78,7 +80,6 @@ public class UploadFileActivity extends AppCompatActivity {
         mFileTypeSpinner.setAdapter(fileTypesAdapter);
 
         mUploadButton = findViewById(R.id.act_upload_file_upload_button);
-        mUploadButton.setEnabled(false);
 
         mToolbar = findViewById(R.id.act_upload_file_toolbar);
         setSupportActionBar(mToolbar);
@@ -91,12 +92,62 @@ public class UploadFileActivity extends AppCompatActivity {
         mFileViewModel = ViewModelProviders.of(this).get(FileViewModel.class);
     }
 
+    private void uploadFile() {
+        FileEntity fileEntity = new FileEntity();
+        fileEntity.setFileType(FileType.valueOf(mFileTypeSpinner.getSelectedItem().toString()));
+        fileEntity.setTitle(mTitleTextInput.getEditText().getText().toString());
+
+        mUserViewModel.userFromDB().observe(this, userBDResource -> {
+            showProgressBar();
+
+            if (userBDResource != null && userBDResource.getStatus() == NetworkStatus.SUCCESS) {
+                fileEntity.setAuthorId(userBDResource.getData().getId());
+                mFileViewModel.uploadFile(fileEntity, choosenFile, false).observe(this, fileEntityDtoResource -> {
+                    if (fileEntityDtoResource == null) {
+                        Toast.makeText(this, R.string.received_null_data, Toast.LENGTH_LONG).show();
+                        hideProgressBar();
+                        return;
+                    }
+
+                    switch (fileEntityDtoResource.getStatus()) {
+                        case SUCCESS:
+                            Toast.makeText(this, R.string.successful_upload, Toast.LENGTH_SHORT).show();
+                            showSuccessfulAlertDialog();
+                            break;
+                        case ERROR:
+                            Toast.makeText(this, fileEntityDtoResource.getMessage(), Toast.LENGTH_LONG).show();
+                            break;
+                        default:
+                            Toast.makeText(this, R.string.unknown_status, Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                hideProgressBar();
+            }
+        });
+    }
+
+    private void showSuccessfulAlertDialog() {
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.dialog_file_upload_message)
+                .setTitle(R.string.dialog_file_upload_title)
+                .setPositiveButton(R.string.yes, (dialog, which) -> clearFields())
+                .setNegativeButton(R.string.no, (dialog, which) -> finish())
+                .show();
+    }
+
     private void hideProgressBar() {
         mProgressBar.setVisibility(View.GONE);
     }
 
     private void showProgressBar() {
         mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void clearFields() {
+        choosenFile = null;
+        mUploadButton.setEnabled(false);
+        mTitleTextInput.getEditText().setText("");
     }
 
     private boolean validateFields() {
@@ -124,40 +175,6 @@ public class UploadFileActivity extends AppCompatActivity {
         }
 
         return true;
-    }
-
-    private void uploadFile() {
-        FileEntity fileEntity = new FileEntity();
-        fileEntity.setFileType(FileType.valueOf(mFileTypeSpinner.getSelectedItem().toString()));
-        fileEntity.setTitle(mTitleTextInput.getEditText().getText().toString());
-
-        mUserViewModel.userFromDB().observe(this, userBDResource -> {
-            showProgressBar();
-
-            if (userBDResource != null && userBDResource.getStatus() == NetworkStatus.SUCCESS) {
-                fileEntity.setAuthorId(userBDResource.getData().getId());
-                mFileViewModel.uploadFile(fileEntity, choosenFile, false).observe(this, fileEntityDtoResource -> {
-                    if (fileEntityDtoResource == null) {
-                        Toast.makeText(this, R.string.received_null_data, Toast.LENGTH_LONG).show();
-                        hideProgressBar();
-                        return;
-                    }
-
-                    switch (fileEntityDtoResource.getStatus()) {
-                        case SUCCESS:
-                            Toast.makeText(this, R.string.successful_upload, Toast.LENGTH_SHORT).show();
-                            break;
-                        case ERROR:
-                            Toast.makeText(this, fileEntityDtoResource.getMessage(), Toast.LENGTH_LONG).show();
-                            break;
-                        default:
-                            Toast.makeText(this, R.string.unknown_status, Toast.LENGTH_LONG).show();
-                    }
-                });
-
-                hideProgressBar();
-            }
-        });
     }
 
     @Override
