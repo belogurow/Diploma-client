@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#ffeb3b</color>
+    <color name="colorPrimaryDark">#c8b900</color>
+    <color name="colorPrimaryLight">#ffff72</color>
+    <color name="colorAccent">#5e35b1</color>
+    <color name="colorSecondary">@color/colorAccent</color>
+    <color name="colorSecondaryDark">#280680</color>
+    <color name="colorSecondaryLight">#9162e4</color>
+
+    <!--<color name="material_drawer_primary">@color/md_purple_50</color>-->
+    <color name="material_drawer_selected">@color/md_grey_700</color>
+    <color name="material_drawer_selected_text">@color/md_white_1000</color>
+
+    <color name="button_background">@color/md_grey_700</color>
+    <color name="button_text">@color/md_white_1000</color>
 
     <color name="chatRoom_myMessage">@color/md_light_blue_50</color>
     <color name="chatRoom_anotherMessage">@color/md_lime_50</color>

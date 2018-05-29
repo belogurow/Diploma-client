@@ -1,6 +1,8 @@
 package ru.belogurow.socialnetworkclient.ui.adapter;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,9 +13,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.signature.ObjectKey;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -28,9 +33,22 @@ import ru.belogurow.socialnetworkclient.ui.activity.StlViewerActivity;
 public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder> {
 
     private List<FileEntityDto> mFileEntityDtos;
+    private Drawable defaultFileIcon;
+    private Context mContext;
+
+    public FilesAdapter(Context context) {
+        mFileEntityDtos = new ArrayList<>();
+        mContext = context;
+
+        defaultFileIcon = new IconicsDrawable(context)
+                .icon(FontAwesome.Icon.faw_file)
+                .color(context.getResources().getColor(R.color.md_grey_500))
+                .sizeDp(48);
+    }
 
     public void setFileEntityDtos(List<FileEntityDto> fileEntityDtos) {
-        mFileEntityDtos = fileEntityDtos;
+        mFileEntityDtos.clear();
+        mFileEntityDtos.addAll(fileEntityDtos);
         notifyDataSetChanged();
     }
 
@@ -75,6 +93,7 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder> 
         FileEntityDto fileEntityDto = mFileEntityDtos.get(position);
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
 
+        holder.mFilePreviewImageView.setImageDrawable(defaultFileIcon);
         holder.mTitleTextView.setText(fileEntityDto.getTitle());
         holder.mDateTextView.setText(dateFormat.format(fileEntityDto.getUpdateTime()));
         holder.mFileTypeTextView.setText(fileEntityDto.getFileType().toString());
@@ -83,8 +102,7 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder> 
     }
 
     private void setImageWithGlide(ViewHolder viewHolder, FileEntityDto file) {
-        viewHolder.mFilePreviewImageView.setImageDrawable(
-                viewHolder.itemView.getContext().getResources().getDrawable(R.drawable.file_icon));
+//        viewHolder.mFilePreviewImageView.setImageDrawable(defaultFileIcon);
 
         if (file.getFileType().equals(FileType.JPG)) {
             GlideApp.with(viewHolder.itemView.getContext())
@@ -93,7 +111,7 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder> 
                     .transition(DrawableTransitionOptions.withCrossFade())
 //                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                     .signature(new ObjectKey(file.getDataUrl()))
-                    .error(R.drawable.file_icon)
+                    .error(defaultFileIcon)
                     .into(viewHolder.mFilePreviewImageView);
         }
     }

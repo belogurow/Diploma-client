@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -21,6 +22,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.util.concurrent.ExecutionException;
 
@@ -126,6 +128,21 @@ public class MainActivity extends AppCompatActivity {
                 .withHeaderBackground(R.drawable.navigation_drawer_background)
                 .withSelectionListEnabledForSingleProfile(false)
                 .addProfiles(mProfileDrawerItem)
+                .withOnAccountHeaderProfileImageListener(new AccountHeader.OnAccountHeaderProfileImageListener() {
+                    @Override
+                    public boolean onProfileImageClick(View view, IProfile profile, boolean current) {
+                        mToolbar.setTitle(R.string.my_profile);
+                        navigationSelectedItem = 0;
+                        openFragment();
+
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onProfileImageLongClick(View view, IProfile profile, boolean current) {
+                        return false;
+                    }
+                })
                 .build();
 
 //        if (currentUser == null) {
@@ -141,6 +158,8 @@ public class MainActivity extends AppCompatActivity {
         PrimaryDrawerItem myProfile = new PrimaryDrawerItem()
                 .withIdentifier(0)
                 .withName(R.string.my_profile)
+                .withIcon(FontAwesome.Icon.faw_user2)
+//                .withSelectedColor(getResources().getColor(R.color.colorSelectedItemNavDrawer))
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.my_profile);
                     navigationSelectedItem = 0;
@@ -152,6 +171,8 @@ public class MainActivity extends AppCompatActivity {
         PrimaryDrawerItem users = new PrimaryDrawerItem()
                 .withIdentifier(1)
                 .withName(R.string.users)
+                .withIcon(FontAwesome.Icon.faw_users)
+//                .withSelectedColor(getResources().getColor(R.color.colorSelectedItemNavDrawer))
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.users);
                     navigationSelectedItem = 1;
@@ -163,6 +184,8 @@ public class MainActivity extends AppCompatActivity {
         PrimaryDrawerItem dialogs = new PrimaryDrawerItem()
                 .withIdentifier(2)
                 .withName(R.string.dialogs)
+                .withIcon(FontAwesome.Icon.faw_comment2)
+//                .withSelectedColor(getResources().getColor(R.color.colorSelectedItemNavDrawer))
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.dialogs);
                     navigationSelectedItem = 2;
@@ -174,6 +197,8 @@ public class MainActivity extends AppCompatActivity {
         PrimaryDrawerItem files = new PrimaryDrawerItem()
                 .withIdentifier(3)
                 .withName(R.string.my_files)
+                .withIcon(FontAwesome.Icon.faw_file2)
+//                .withSelectedColor(getResources().getColor(R.color.colorSelectedItemNavDrawer))
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.my_files);
                     navigationSelectedItem = 3;
@@ -185,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
         SecondaryDrawerItem elseItem = new SecondaryDrawerItem()
                 .withIdentifier(3)
                 .withName(R.string.else_field)
+//                .withSelectedColor(getResources().getColor(R.color.colorSelectedItemNavDrawer))
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.else_field);
                     navigationSelectedItem = 3;
@@ -196,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
         SecondaryDrawerItem websocketItem = new SecondaryDrawerItem()
                 .withIdentifier(4)
                 .withName("WebSocketTest")
+//                .withSelectedColor(getResources().getColor(R.color.colorSecondaryLight))
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -217,8 +244,8 @@ public class MainActivity extends AppCompatActivity {
                         users,
                         dialogs,
                         files,
-                        new DividerDrawerItem(),
-                        websocketItem
+                        new DividerDrawerItem()
+//                        websocketItem
                 )
                 .withSelectedItem(navigationSelectedItem)
                 .build();

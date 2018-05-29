@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,9 +19,6 @@ import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.ui.adapter.UsersListAdapter;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-
 
 public class FragmentUserList extends Fragment {
 
@@ -28,6 +26,7 @@ public class FragmentUserList extends Fragment {
 
     private UserViewModel mUserViewModel;
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mUsersRecyclerView;
     private UsersListAdapter mUsersAdapter;
     private ProgressBar mProgressBar;
@@ -44,6 +43,11 @@ public class FragmentUserList extends Fragment {
 
         initFields(view);
 
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            loadUsers();
+            hideProgressBar();
+        });
+
         return view;
     }
 
@@ -51,11 +55,16 @@ public class FragmentUserList extends Fragment {
     public void onStart() {
         super.onStart();
 
+        loadUsers();
+    }
+
+    private void loadUsers() {
         mUserViewModel.getAllUsers().observe(this, listResource -> {
-            mProgressBar.setVisibility(VISIBLE);
+            showProgressBar();
 
             if (listResource == null) {
-                Toast.makeText(getActivity(), "Received null data", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), R.string.received_null_data, Toast.LENGTH_LONG).show();
+                hideProgressBar();
                 return;
             }
 
@@ -67,14 +76,15 @@ public class FragmentUserList extends Fragment {
                     Toast.makeText(getActivity(), listResource.getMessage(), Toast.LENGTH_LONG).show();
                     break;
                 default:
-                    Toast.makeText(getActivity(), "Unknown status", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.unknown_status, Toast.LENGTH_LONG).show();
             }
 
-            mProgressBar.setVisibility(GONE);
+            hideProgressBar();
         });
     }
 
     private void initFields(View view) {
+        mSwipeRefreshLayout = view.findViewById(R.id.frag_user_list_swipelayout);
         mUsersRecyclerView = view.findViewById(R.id.recycler_frag_user_list);
         mProgressBar = view.findViewById(R.id.progress_frag_user_list);
         mUsersAdapter = new UsersListAdapter(view.getContext());
@@ -84,9 +94,16 @@ public class FragmentUserList extends Fragment {
         mUsersRecyclerView.setAdapter(mUsersAdapter);
         mUsersRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
             DividerItemDecoration.VERTICAL));
-
-        mProgressBar.setVisibility(VISIBLE);
+        mUsersRecyclerView.setHasFixedSize(true);
 
         mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+    }
+
+    private void hideProgressBar() {
+        mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void showProgressBar() {
+        mSwipeRefreshLayout.setRefreshing(true);
     }
 }

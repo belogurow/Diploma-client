@@ -2,11 +2,13 @@ package ru.belogurow.socialnetworkclient.ui.fragment;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
 
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.chat.viewModel.FileViewModel;
@@ -31,6 +36,7 @@ public class FragmentMyFiles extends Fragment {
     private UserViewModel mUserViewModel;
     private FileViewModel mFileViewModel;
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private ProgressBar mProgressBar;
     private FloatingActionButton mAddFileFloatingActionButton;
@@ -50,27 +56,36 @@ public class FragmentMyFiles extends Fragment {
 
         initFields(view);
 
-        mAddFileFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent uploadFileActivity = new Intent(v.getContext(), UploadFileActivity.class);
-                startActivity(uploadFileActivity);
-            }
+        mAddFileFloatingActionButton.setOnClickListener(v -> {
+            Intent uploadFileActivity = new Intent(v.getContext(), UploadFileActivity.class);
+            startActivity(uploadFileActivity);
+        });
+
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            updateFilesList();
+            mSwipeRefreshLayout.setRefreshing(false);
         });
 
         return view;
     }
 
     private void initFields(View view) {
+        mSwipeRefreshLayout = view.findViewById(R.id.frag_my_files_swipelayout);
         mRecyclerView = view.findViewById(R.id.frag_my_files_recycler);
         mAddFileFloatingActionButton = view.findViewById(R.id.frag_my_files_floatting);
         mProgressBar = view.findViewById(R.id.frag_my_files_progress);
 
-        mFilesAdapter = new FilesAdapter();
+        mAddFileFloatingActionButton.setImageDrawable(new IconicsDrawable(view.getContext())
+                .icon(FontAwesome.Icon.faw_plus)
+                .color(Color.WHITE)
+                .sizeDp(24));
+
+        mFilesAdapter = new FilesAdapter(view.getContext());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         mRecyclerView.setAdapter(mFilesAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(),
                 DividerItemDecoration.VERTICAL));
+        mRecyclerView.setHasFixedSize(true);
 
 
         mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
@@ -81,7 +96,10 @@ public class FragmentMyFiles extends Fragment {
     public void onStart() {
         super.onStart();
 
-//        mFilesAdapter.setFileEntityDtos(new LinkedList<>());
+        updateFilesList();
+    }
+
+    private void updateFilesList() {
         mUserViewModel.userFromDB().observe(this, userDtoResource -> {
             showProgressBar();
 
@@ -114,14 +132,15 @@ public class FragmentMyFiles extends Fragment {
                 });
             }
         });
-
     }
 
     private void showProgressBar() {
-        mProgressBar.setVisibility(View.VISIBLE);
+//        mProgressBar.setVisibility(View.VISIBLE);
+        mSwipeRefreshLayout.setRefreshing(true);
     }
 
     private void hideProgressBar() {
-        mProgressBar.setVisibility(View.GONE);
+//        mProgressBar.setVisibility(View.GONE);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 }

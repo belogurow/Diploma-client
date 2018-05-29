@@ -37,7 +37,7 @@
     <string name="received_null_data">Received null data</string>
     <string name="list_is_empty">List is empty</string>
     <string name="unknown_status">Unknown status</string>
-    <string name="my_files">My files</string>
+    <string name="my_files">Files</string>
     <string name="pick_file">Pick file</string>
     <string name="cannot_pick_file">Cannot pick file</string>
     <string name="successful_upload">Successful</string>

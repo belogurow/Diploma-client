@@ -2,6 +2,7 @@ package ru.belogurow.socialnetworkclient.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,7 +13,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.signature.ObjectKey;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.belogurow.socialnetworkclient.App;
@@ -26,15 +30,23 @@ import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.ViewHolder>{
 
     private List<UserDto> mUserList;
+    private Drawable defaultUserIcon;
     private Context mContext;
 
-    public void setUserList(List<UserDto> userList) {
-        mUserList = userList;
-        notifyDataSetChanged();
+    public UsersListAdapter(Context context) {
+        mUserList = new ArrayList<>();
+        mContext = context;
+
+        defaultUserIcon = new IconicsDrawable(context)
+                .icon(FontAwesome.Icon.faw_user_circle2)
+                .color(context.getResources().getColor(R.color.md_grey_500))
+                .sizeDp(48);
     }
 
-    public UsersListAdapter(Context context) {
-        mContext = context;
+    public void setUserList(List<UserDto> userList) {
+        mUserList.clear();
+        mUserList.addAll(userList);
+        notifyDataSetChanged();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -75,6 +87,7 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
         UserDto currentUser = mUserList.get(position);
 
         // Set data
+        holder.mUserAvatarImageView.setImageDrawable(defaultUserIcon);
         holder.mFullnameTextView.setText(currentUser.getName());
         holder.mUsernameTextView.setText(currentUser.getUsername());
 
@@ -86,14 +99,12 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
 
     private void setImageWithGlide(FileEntityDto avatarFile, ViewHolder viewHolder) {
         GlideApp.with(mContext)
-                .clear(viewHolder.mUserAvatarImageView);
-
-        GlideApp.with(mContext)
                 .load(App.BASE_URL + avatarFile.getDataUrl())
                 .fitCenter()
                 .transition(DrawableTransitionOptions.withCrossFade())
 //                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .signature(new ObjectKey(avatarFile.getDataUrl()))
+                .error(defaultUserIcon)
                 .into(viewHolder.mUserAvatarImageView);
     }
 

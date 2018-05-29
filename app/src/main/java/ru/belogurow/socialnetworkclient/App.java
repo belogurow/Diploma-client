@@ -1,8 +1,10 @@
 package ru.belogurow.socialnetworkclient;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.facebook.stetho.Stetho;
+import com.mikepenz.iconics.context.IconicsContextWrapper;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -70,4 +72,8 @@ public class App extends Application {
         Stetho.initializeWithDefaults(this);
     }
 
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(IconicsContextWrapper.wrap(base));
+    }
 }
