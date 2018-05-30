@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAccountHeader = new AccountHeaderBuilder()
                 .withActivity(this)
-                .withHeaderBackground(R.drawable.navigation_drawer_background)
+                .withHeaderBackground(R.drawable.navigation_drawer_background2)
                 .withSelectionListEnabledForSingleProfile(false)
                 .addProfiles(mProfileDrawerItem)
                 .withOnAccountHeaderProfileImageListener(new AccountHeader.OnAccountHeaderProfileImageListener() {
@@ -145,21 +145,10 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .build();
 
-//        if (currentUser == null) {
-//            headerBuilder.
-//        } else {
-//            mProfileDrawerItem = new ProfileDrawerItem()
-//                    .withName(currentUser.getName())
-//                    .withEmail(currentUser.getUsername())
-//                    .withIcon()
-//            headerBuilder.addProfiles(mProfileDrawerItem);
-//        }
-
         PrimaryDrawerItem myProfile = new PrimaryDrawerItem()
                 .withIdentifier(0)
                 .withName(R.string.my_profile)
                 .withIcon(FontAwesome.Icon.faw_user2)
-//                .withSelectedColor(getResources().getColor(R.color.colorSelectedItemNavDrawer))
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.my_profile);
                     navigationSelectedItem = 0;
@@ -172,7 +161,6 @@ public class MainActivity extends AppCompatActivity {
                 .withIdentifier(1)
                 .withName(R.string.users)
                 .withIcon(FontAwesome.Icon.faw_users)
-//                .withSelectedColor(getResources().getColor(R.color.colorSelectedItemNavDrawer))
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.users);
                     navigationSelectedItem = 1;
@@ -185,7 +173,6 @@ public class MainActivity extends AppCompatActivity {
                 .withIdentifier(2)
                 .withName(R.string.dialogs)
                 .withIcon(FontAwesome.Icon.faw_comment2)
-//                .withSelectedColor(getResources().getColor(R.color.colorSelectedItemNavDrawer))
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.dialogs);
                     navigationSelectedItem = 2;
@@ -198,7 +185,6 @@ public class MainActivity extends AppCompatActivity {
                 .withIdentifier(3)
                 .withName(R.string.my_files)
                 .withIcon(FontAwesome.Icon.faw_file2)
-//                .withSelectedColor(getResources().getColor(R.color.colorSelectedItemNavDrawer))
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.my_files);
                     navigationSelectedItem = 3;
@@ -210,7 +196,6 @@ public class MainActivity extends AppCompatActivity {
         SecondaryDrawerItem elseItem = new SecondaryDrawerItem()
                 .withIdentifier(3)
                 .withName(R.string.else_field)
-//                .withSelectedColor(getResources().getColor(R.color.colorSelectedItemNavDrawer))
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.else_field);
                     navigationSelectedItem = 3;
@@ -222,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
         SecondaryDrawerItem websocketItem = new SecondaryDrawerItem()
                 .withIdentifier(4)
                 .withName("WebSocketTest")
-//                .withSelectedColor(getResources().getColor(R.color.colorSecondaryLight))
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {

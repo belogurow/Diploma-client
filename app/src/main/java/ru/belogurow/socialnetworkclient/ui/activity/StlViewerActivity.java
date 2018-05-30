@@ -55,7 +55,6 @@ public class StlViewerActivity extends AppCompatActivity {
         askPermissions();
 
         // Show stl model in web view
-        showProgressBar();
         Call<ResponseBody> call = App.sFileWebService.getFileById(fileEntityDto.getId());
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -67,13 +66,14 @@ public class StlViewerActivity extends AppCompatActivity {
                         stlFile = new File(path, fileEntityDto.getTitle() + fileEntityDto.getFileType().toString().toLowerCase());
                         FileOutputStream fileOutputStream = new FileOutputStream(stlFile);
                         IOUtils.write(response.body().bytes(), fileOutputStream);
-                        hideProgressBar();
 
                         showWebView(stlFile.getAbsolutePath());
                     } catch (IOException e) {
                         e.printStackTrace();
                         hideProgressBar();
                     }
+                } else {
+                    hideProgressBar();
                 }
             }
 
@@ -88,7 +88,7 @@ public class StlViewerActivity extends AppCompatActivity {
     private void initFields(FileEntityDto fileEntityDto) {
         mWebView = findViewById(R.id.act_stl_viewer_web);
         mProgressBar = findViewById(R.id.act_stl_viewer_progress);
-        hideProgressBar();
+        showProgressBar();
 
         mToolbar = findViewById(R.id.act_stl_viewer_toolbar);
         setSupportActionBar(mToolbar);
@@ -106,9 +106,11 @@ public class StlViewerActivity extends AppCompatActivity {
         mWebView.getSettings().setSaveFormData(true);
         mWebView.getSettings().setAllowFileAccessFromFileURLs(true);
         mWebView.getSettings().setBuiltInZoomControls(true);
+
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
+                hideProgressBar();
                 Log.d(TAG, "onPageFinished: " + stl);
 
                 mWebView.loadUrl("javascript:loadStl('" + stl + "')"); //if passing in an object. Mapping may need to take place

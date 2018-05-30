@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,9 +23,6 @@ import ru.belogurow.socialnetworkclient.ui.adapter.DialogsAdapter;
 import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-
 public class FragmentDialogs extends Fragment {
 
     private static final String TAG = FragmentDialogs.class.getSimpleName();
@@ -32,6 +30,7 @@ public class FragmentDialogs extends Fragment {
     private UserViewModel mUserViewModel;
     private ChatViewModel mChatViewModel;
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private DialogsAdapter mDialogsAdapter;
     private ProgressBar mProgressBar;
@@ -50,6 +49,8 @@ public class FragmentDialogs extends Fragment {
 
         initFields(view);
 
+        mSwipeRefreshLayout.setOnRefreshListener(this::loadDialogs);
+
         return view;
     }
 
@@ -57,9 +58,13 @@ public class FragmentDialogs extends Fragment {
     public void onStart() {
         super.onStart();
 
+        loadDialogs();
 
+    }
+
+    private void loadDialogs() {
         mUserViewModel.userFromDB().observe(this, userResource -> {
-            mProgressBar.setVisibility(VISIBLE);
+            showProgressBar();
 
             if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
                 currentUser = userResource.getData();
@@ -67,6 +72,7 @@ public class FragmentDialogs extends Fragment {
                 mChatViewModel.getAllChatsByUserId(currentUser.getId()).observe(this, chatResource -> {
                     if (chatResource == null) {
                         Toast.makeText(getContext(), R.string.received_null_data, Toast.LENGTH_LONG).show();
+                        hideProgressBar();
                         return;
                     }
 
@@ -86,14 +92,16 @@ public class FragmentDialogs extends Fragment {
                             Toast.makeText(getContext(), R.string.unknown_status, Toast.LENGTH_LONG).show();
                     }
 
+                    hideProgressBar();
                 });
+            } else {
+                hideProgressBar();
             }
-            mProgressBar.setVisibility(GONE);
         });
-
     }
 
     private void initFields(View view) {
+        mSwipeRefreshLayout = view.findViewById(R.id.frag_user_list_swipelayout);
         mRecyclerView = view.findViewById(R.id.recycler_frag_user_list);
         mProgressBar = view.findViewById(R.id.progress_frag_user_list);
         mDialogsAdapter = new DialogsAdapter(view.getContext());
@@ -102,8 +110,17 @@ public class FragmentDialogs extends Fragment {
         mRecyclerView.setAdapter(mDialogsAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(),
                 DividerItemDecoration.VERTICAL));
+        mRecyclerView.setHasFixedSize(true);
 
         mChatViewModel = ViewModelProviders.of(this).get(ChatViewModel.class);
         mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+    }
+
+    private void hideProgressBar() {
+        mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void showProgressBar() {
+        mSwipeRefreshLayout.setRefreshing(true);
     }
 }

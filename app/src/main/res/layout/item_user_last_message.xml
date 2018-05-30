@@ -7,22 +7,22 @@
 
     <ImageView
         android:id="@+id/item_user_last_message_avatar_image"
-        android:layout_width="72dp"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="72dp"
+        android:padding="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="h,1:1"
         app:layout_constraintEnd_toStartOf="@+id/guideline4"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/empty_avatar"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/item_user_last_message_fullname_text"
         style="@style/marginTopPosition"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/test_textView"
-        android:textAppearance="@style/TextTitle"
+        android:textColor="@color/primary_text"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -32,8 +32,8 @@
         style="@style/marginBottomPosition"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/test_textView"
-        android:textAppearance="@style/TextSubTitle"
+        android:textColor="@color/secondary_text"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline4"

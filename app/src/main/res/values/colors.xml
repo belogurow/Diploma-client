@@ -13,6 +13,7 @@
     <color name="material_drawer_selected_text">@color/md_white_1000</color>
 
     <color name="button_background">@color/md_grey_700</color>
+    <color name="button_background_disable">@color/md_grey_300</color>
     <color name="button_text">@color/md_white_1000</color>
 
     <color name="chatRoom_myMessage">@color/md_light_blue_50</color>

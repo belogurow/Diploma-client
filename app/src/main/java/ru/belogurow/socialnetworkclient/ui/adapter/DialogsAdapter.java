@@ -2,6 +2,7 @@ package ru.belogurow.socialnetworkclient.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,13 +13,17 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.signature.ObjectKey;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.belogurow.socialnetworkclient.App;
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.chat.dto.ChatRoomDto;
 import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
+import ru.belogurow.socialnetworkclient.chat.model.FileType;
 import ru.belogurow.socialnetworkclient.common.extra.Extras;
 import ru.belogurow.socialnetworkclient.common.web.GlideApp;
 import ru.belogurow.socialnetworkclient.ui.activity.ChatRoomActivity;
@@ -29,14 +34,22 @@ public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHold
     private List<ChatRoomDto> mChatRoomDtos;
     private UserDto currentUser;
     private Context mContext;
+    private Drawable defaultUserIcon;
 
     public void setChatList(List<ChatRoomDto> chatRooms) {
-        mChatRoomDtos = chatRooms;
+        mChatRoomDtos.clear();
+        mChatRoomDtos.addAll(chatRooms);
         notifyDataSetChanged();
     }
 
     public DialogsAdapter(Context context) {
         mContext = context;
+        mChatRoomDtos = new ArrayList<>();
+
+        defaultUserIcon = new IconicsDrawable(context)
+                .icon(FontAwesome.Icon.faw_user_circle2)
+                .color(context.getResources().getColor(R.color.md_grey_500))
+                .sizeDp(48);
     }
 
     public void setCurrentUser(UserDto currentUser) {
@@ -99,19 +112,23 @@ public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHold
         holder.mFullnameTextView.setText(anotherUser.getName());
 
         // Set avatar image
+        holder.mImageViewAvatar.setImageDrawable(defaultUserIcon);
         if (anotherUser.getUserProfile() != null && anotherUser.getUserProfile().getAvatarFile() != null) {
             setImageWithGlide(anotherUser.getUserProfile().getAvatarFile(), holder);
         }
     }
 
     private void setImageWithGlide(FileEntityDto avatarFile, ViewHolder viewHolder) {
-        GlideApp.with(mContext)
-                .load(App.BASE_URL + avatarFile.getDataUrl())
-                .fitCenter()
-                .transition(DrawableTransitionOptions.withCrossFade())
+        if (avatarFile.getFileType().equals(FileType.JPG)) {
+            GlideApp.with(mContext)
+                    .load(App.BASE_URL + avatarFile.getDataUrl())
+                    .fitCenter()
+                    .transition(DrawableTransitionOptions.withCrossFade())
 //                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .signature(new ObjectKey(avatarFile.getDataUrl()))
-                .into(viewHolder.mImageViewAvatar);
+                    .signature(new ObjectKey(avatarFile.getDataUrl()))
+                    .error(defaultUserIcon)
+                    .into(viewHolder.mImageViewAvatar);
+        }
     }
 
     @Override

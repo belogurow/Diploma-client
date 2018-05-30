@@ -124,7 +124,6 @@ public class FragmentChat extends Fragment {
         mRecyclerView.setAdapter(mChatRoomAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        // TODO: 20.05.2018 GET MESSAGES FROM SERVER
         mMessages = new LinkedList<>();
         mChatRoomAdapter.setMessagesList(mMessages);
     }

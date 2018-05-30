@@ -73,7 +73,7 @@ public class FragmentMyProfile extends Fragment {
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             subscribeProfile();
-            mSwipeRefreshLayout.setRefreshing(false);
+            hideProgressBar();
         });
 
         return view;

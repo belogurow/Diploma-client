@@ -120,8 +120,9 @@ public class UploadFileActivity extends AppCompatActivity {
                         default:
                             Toast.makeText(this, R.string.unknown_status, Toast.LENGTH_LONG).show();
                     }
+                    hideProgressBar();
                 });
-
+            } else {
                 hideProgressBar();
             }
         });

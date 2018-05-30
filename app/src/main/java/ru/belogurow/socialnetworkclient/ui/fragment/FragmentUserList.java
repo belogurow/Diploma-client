@@ -43,10 +43,7 @@ public class FragmentUserList extends Fragment {
 
         initFields(view);
 
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            loadUsers();
-            hideProgressBar();
-        });
+        mSwipeRefreshLayout.setOnRefreshListener(this::loadUsers);
 
         return view;
     }
@@ -70,7 +67,11 @@ public class FragmentUserList extends Fragment {
 
             switch (listResource.getStatus()) {
                 case SUCCESS:
-                    mUsersAdapter.setUserList(listResource.getData());
+                    if (listResource.getData().isEmpty()) {
+                        Toast.makeText(getContext(), R.string.list_is_empty, Toast.LENGTH_SHORT).show();
+                    } else {
+                        mUsersAdapter.setUserList(listResource.getData());
+                    }
                     break;
                 case ERROR:
                     Toast.makeText(getActivity(), listResource.getMessage(), Toast.LENGTH_LONG).show();

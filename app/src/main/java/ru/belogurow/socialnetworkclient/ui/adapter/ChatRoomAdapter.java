@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,9 +27,19 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private ChatRoomDto mChatRoomDto;
     private UserDto currentUser;
 
+    public ChatRoomAdapter() {
+        mMessages = new LinkedList<>();
+    }
+
     public void setMessagesList(List<ChatMessageDto> messages) {
-        mMessages = messages;
+        mMessages.clear();
+        mMessages.addAll(messages);
         notifyDataSetChanged();
+    }
+
+    public void addMessage(ChatMessageDto messageDto) {
+        mMessages.add(messageDto);
+        notifyItemInserted(mMessages.size() - 1);
     }
 
     public void setChatRoomDto(ChatRoomDto chatRoomDto) {

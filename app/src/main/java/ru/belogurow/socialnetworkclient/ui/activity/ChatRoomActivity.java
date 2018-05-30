@@ -68,9 +68,13 @@ public class ChatRoomActivity extends AppCompatActivity {
         Intent intent = getIntent();
         UUID anotherUserId = (UUID) intent.getSerializableExtra(Extras.EXTRA_USER_ID);
 
+        loadMessages(intent, anotherUserId);
+    }
+
+    private void loadMessages(Intent intent, UUID anotherUserId) {
         if (anotherUserId != null) {
             mUserViewModel.userFromDB().observe(this, userResource -> {
-                mProgressBar.setVisibility(View.VISIBLE);
+                showProgressBar();
 
                 if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
                     UserDto currentUser = userResource.getData();
@@ -78,7 +82,8 @@ public class ChatRoomActivity extends AppCompatActivity {
                     mChatViewModel.getChatRoom(new ChatRoom(currentUser.getId(), anotherUserId))
                             .observe(this, chatRoomResource -> {
                                 if (chatRoomResource == null) {
-                                    Toast.makeText(this, "Received null data", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(this, R.string.received_null_data, Toast.LENGTH_LONG).show();
+                                    hideProgressBar();
                                     return;
                                 }
 
@@ -91,24 +96,25 @@ public class ChatRoomActivity extends AppCompatActivity {
                                         Toast.makeText(this, userResource.getMessage(), Toast.LENGTH_LONG).show();
                                         break;
                                     default:
-                                        Toast.makeText(this, "Unknown status", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(this, R.string.unknown_status, Toast.LENGTH_LONG).show();
                                 }
+                                hideProgressBar();
                             });
+                } else {
+                    hideProgressBar();
                 }
-
-                mProgressBar.setVisibility(View.GONE);
             });
         } else {
             ChatRoomDto chatRoomDto = (ChatRoomDto) intent.getSerializableExtra(Extras.EXTRA_CHAT_ROOM_DTO);
             mUserViewModel.userFromDB().observe(this, userResource -> {
-                        mProgressBar.setVisibility(View.VISIBLE);
+                showProgressBar();
 
                 if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
                     UserDto currentUser = userResource.getData();
                     initChatData(chatRoomDto, currentUser);
                 }
 
-                mProgressBar.setVisibility(View.GONE);
+                hideProgressBar();
             });
         }
     }
@@ -143,10 +149,6 @@ public class ChatRoomActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
 
-//        mMessages = new LinkedList<>();
-        mChatRoomAdapter.setMessagesList(mMessages);
-
-        mProgressBar.setVisibility(View.VISIBLE);
 
         mChatViewModel = ViewModelProviders.of(this).get(ChatViewModel.class);
         mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
@@ -161,8 +163,11 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private void getAllMessages(ChatRoomDto chatRoomDto) {
         mChatViewModel.getAllMessagesByChatId(chatRoomDto.getId()).observe(this, chatMessageResource -> {
+            showProgressBar();
+
             if (chatMessageResource == null) {
                 Toast.makeText(this, "Received null data", Toast.LENGTH_LONG).show();
+                hideProgressBar();
                 return;
             }
 
@@ -178,15 +183,14 @@ public class ChatRoomActivity extends AppCompatActivity {
                 default:
                     Toast.makeText(this, "Unknown status", Toast.LENGTH_LONG).show();
             }
+            hideProgressBar();
         });
     }
 
     private void initStomp(ChatRoomDto chatRoomDto, UserDto currentUser) {
         OkHttpClient client = SelfSigningClientBuilder.createClient(this);
 
-//        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://192.168.1.64:8090/chat", null, client);
         mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, App.BASE_WEB_SOCKET_URL + "/chatRoom", null, client);
-//        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "wss://94.250.254.169:8090/chatRoom", null, client);
 
         mStompClient.lifecycle()
                 .subscribeOn(Schedulers.io())
@@ -213,8 +217,8 @@ public class ChatRoomActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(message -> {
                     Log.d(TAG, "Received " + message);
-                    mMessages.add(mGson.fromJson(message.getPayload(), ChatMessageDto.class));
-                    mChatRoomAdapter.setMessagesList(mMessages);
+                    mChatRoomAdapter.addMessage(mGson.fromJson(message.getPayload(), ChatMessageDto.class));
+//                    mChatRoomAdapter.setMessagesList(mMessages);
                     mRecyclerView.scrollToPosition(mMessages.size() - 1);
                 });
 
@@ -245,6 +249,14 @@ public class ChatRoomActivity extends AppCompatActivity {
                 .unsubscribeOn(Schedulers.newThread())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private void showProgressBar() {
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        mProgressBar.setVisibility(View.GONE);
     }
 
     @Override
