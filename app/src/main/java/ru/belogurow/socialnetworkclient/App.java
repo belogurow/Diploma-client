@@ -24,8 +24,8 @@ import ru.belogurow.socialnetworkclient.web.SelfSigningClientBuilder;
 
 public class App extends Application {
 
-//    private static final String URL = "10.0.2.2:8090";
-    private static final String URL = "94.250.254.169:8090";
+    private static final String URL = "10.0.2.2:8090";
+//    private static final String URL = "94.250.254.169:8090";
 //    private static final String URL = "192.168.1.64:8090";
 
     public static final String BASE_URL = "https://" + URL;

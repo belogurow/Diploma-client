@@ -1,6 +1,6 @@
 package ru.belogurow.socialnetworkclient.ui.adapter;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -28,21 +28,24 @@ import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
 import ru.belogurow.socialnetworkclient.chat.model.FileType;
 import ru.belogurow.socialnetworkclient.common.extra.Extras;
 import ru.belogurow.socialnetworkclient.common.web.GlideApp;
+import ru.belogurow.socialnetworkclient.ui.activity.ChatRoomActivity;
 import ru.belogurow.socialnetworkclient.ui.activity.StlViewerActivity;
 
 public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder> {
 
     private List<FileEntityDto> mFileEntityDtos;
     private Drawable defaultFileIcon;
-    private Context mContext;
+    private Activity mActivity;
+    private boolean isFilePickable;
 
-    public FilesAdapter(Context context) {
+    public FilesAdapter(Activity activity, boolean isFilePickable) {
         mFileEntityDtos = new ArrayList<>();
-        mContext = context;
+        mActivity = activity;
+        this.isFilePickable = isFilePickable;
 
-        defaultFileIcon = new IconicsDrawable(context)
+        defaultFileIcon = new IconicsDrawable(activity)
                 .icon(FontAwesome.Icon.faw_file)
-                .color(context.getResources().getColor(R.color.md_grey_500))
+                .color(activity.getResources().getColor(R.color.md_grey_500))
                 .sizeDp(48);
     }
 
@@ -73,11 +76,17 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder> 
         public void onClick(View v) {
             int position = getLayoutPosition();
 
-            if (mFileEntityDtos.get(position).getFileType().equals(FileType.STL)) {
+            if (isFilePickable) {
+                Intent result = new Intent();
+                result.putExtra(Extras.EXTRA_FILE_ENTITY_DTO, mFileEntityDtos.get(position));
+                mActivity.setResult(ChatRoomActivity.REQUEST_CODE_PICK_FROM_FILES, result);
+                mActivity.finish();
+            } else if (mFileEntityDtos.get(position).getFileType().equals(FileType.STL)) {
                 Intent aboutFileActivity = new Intent(v.getContext(), StlViewerActivity.class);
                 aboutFileActivity.putExtra(Extras.EXTRA_FILE_ENTITY_DTO, mFileEntityDtos.get(position));
                 v.getContext().startActivity(aboutFileActivity);
             }
+
         }
     }
 

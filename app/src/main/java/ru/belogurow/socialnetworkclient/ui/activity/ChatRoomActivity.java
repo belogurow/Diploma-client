@@ -3,6 +3,7 @@ package ru.belogurow.socialnetworkclient.ui.activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,13 +11,15 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +32,7 @@ import ru.belogurow.socialnetworkclient.App;
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.chat.dto.ChatMessageDto;
 import ru.belogurow.socialnetworkclient.chat.dto.ChatRoomDto;
+import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
 import ru.belogurow.socialnetworkclient.chat.model.ChatRoom;
 import ru.belogurow.socialnetworkclient.chat.viewModel.ChatViewModel;
 import ru.belogurow.socialnetworkclient.common.extra.Extras;
@@ -44,19 +48,27 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private static final String TAG = ChatRoom.class.getSimpleName();
 
+    public static final int REQUEST_CODE_PICK_FROM_FILES = 2;
+    public static final int REQUEST_CODE_PICK_FROM_STORAGE = 4;
+
+
     private UserViewModel mUserViewModel;
     private ChatViewModel mChatViewModel;
 
     private RecyclerView mRecyclerView;
     private ProgressBar mProgressBar;
     private EditText mMessageEditText;
-    private Button mSendMessageButton;
+    private ImageView mImageViewSendMessage;
     private Toolbar mToolbar;
     private ChatRoomAdapter mChatRoomAdapter;
     private StompClient mStompClient;
+    private ImageView mImageViewPickFile;
 
     private List<ChatMessageDto> mMessages;
     private Gson mGson = new GsonBuilder().create();
+
+    private ChatRoomDto currentChatRoom;
+    private UserDto currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +89,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 showProgressBar();
 
                 if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
-                    UserDto currentUser = userResource.getData();
+                    currentUser = userResource.getData();
 
                     mChatViewModel.getChatRoom(new ChatRoom(currentUser.getId(), anotherUserId))
                             .observe(this, chatRoomResource -> {
@@ -89,8 +101,8 @@ public class ChatRoomActivity extends AppCompatActivity {
 
                                 switch (chatRoomResource.getStatus()) {
                                     case SUCCESS:
-                                        ChatRoomDto chatRoomDtoData = chatRoomResource.getData();
-                                        initChatData(chatRoomDtoData, currentUser);
+                                        currentChatRoom = chatRoomResource.getData();
+                                        initChatData(currentChatRoom, currentUser);
                                         break;
                                     case ERROR:
                                         Toast.makeText(this, userResource.getMessage(), Toast.LENGTH_LONG).show();
@@ -105,13 +117,13 @@ public class ChatRoomActivity extends AppCompatActivity {
                 }
             });
         } else {
-            ChatRoomDto chatRoomDto = (ChatRoomDto) intent.getSerializableExtra(Extras.EXTRA_CHAT_ROOM_DTO);
+            currentChatRoom = (ChatRoomDto) intent.getSerializableExtra(Extras.EXTRA_CHAT_ROOM_DTO);
             mUserViewModel.userFromDB().observe(this, userResource -> {
                 showProgressBar();
 
                 if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
-                    UserDto currentUser = userResource.getData();
-                    initChatData(chatRoomDto, currentUser);
+                    currentUser = userResource.getData();
+                    initChatData(currentChatRoom, currentUser);
                 }
 
                 hideProgressBar();
@@ -134,8 +146,17 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void initFields() {
         mRecyclerView = findViewById(R.id.recycler_act_chat_room);
         mMessageEditText = findViewById(R.id.message_input_act_chat_room);
-        mSendMessageButton = findViewById(R.id.button_send_act_chat_room);
         mProgressBar = findViewById(R.id.progress_act_chat_room);
+
+        mImageViewSendMessage = findViewById(R.id.act_chat_room_send);
+        mImageViewSendMessage.setImageDrawable(new IconicsDrawable(this)
+                .icon(FontAwesome.Icon.faw_arrow_right)
+                .color(getResources().getColor(R.color.colorSecondary)));
+
+        mImageViewPickFile = findViewById(R.id.act_chat_room_pick_file);
+        mImageViewPickFile.setImageDrawable(new IconicsDrawable(this)
+                .icon(FontAwesome.Icon.faw_paperclip)
+                .color(getResources().getColor(R.color.md_grey_500)));
 
         mToolbar = findViewById(R.id.toolbar_act_chat_room);
         setSupportActionBar(mToolbar);
@@ -231,18 +252,45 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         mStompClient.connect();
 
-        mSendMessageButton.setOnClickListener(v -> {
-            mStompClient.send("/topic/chatRoom/" + chatRoomDto.getId() + "/" + currentUser.getId(), mMessageEditText.getText().toString())
+        mImageViewSendMessage.setOnClickListener(v -> {
+            mStompClient.send("/topic/chatRoom/" + chatRoomDto.getId() + "/" + currentUser.getId() + "/text", mMessageEditText.getText().toString())
                     .compose(applySchedulers())
                     .subscribe(() -> {
-                        Log.d(TAG, "STOMP echo send successfully");
+                        Log.d(TAG, "STOMP echo text send successfully");
                     }, throwable -> {
-                        Log.e(TAG, "Error send STOMP echo", throwable);
+                        Log.e(TAG, "Error text send STOMP echo", throwable);
                     });
 
             mMessageEditText.getText().clear();
         });
+
+        mImageViewPickFile.setOnClickListener(v -> {
+            showAlertDialog();
+
+//            mStompClient.send("/topic/chatRoom/" + chatRoomDto.getId() + "/" + currentUser.getId() + "/file", /* тут id нового файла */)
+//                    .compose(applySchedulers())
+//                    .subscribe(() -> {
+//                        Log.d(TAG, "STOMP echo send successfully");
+//                    }, throwable -> {
+//                        Log.e(TAG, "Error send STOMP echo", throwable);
+//                    });
+//
+//            mMessageEditText.getText().clear();
+        });
     }
+
+    private void sendFile(FileEntityDto fileEntityDto) {
+        mStompClient.send("/topic/chatRoom/" + currentChatRoom.getId() + "/" + currentUser.getId() + "/file", fileEntityDto.getId().toString())
+                    .compose(applySchedulers())
+                    .subscribe(() -> {
+                        Log.d(TAG, "STOMP echo file send successfully");
+                    }, throwable -> {
+                        Log.e(TAG, "Error file send STOMP echo", throwable);
+                    });
+
+        mMessageEditText.getText().clear();
+    }
+
 
     protected CompletableTransformer applySchedulers() {
         return upstream -> upstream
@@ -259,6 +307,27 @@ public class ChatRoomActivity extends AppCompatActivity {
         mProgressBar.setVisibility(View.GONE);
     }
 
+    private void showAlertDialog() {
+        String[] listOfChoices = {getString(R.string.pick_from_my_files), getString(R.string.pick_from_phone_storage)};
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.pick_file)
+                .setItems(listOfChoices, (dialog, which) -> {
+                    switch (which) {
+                        case 0:
+                            // open activity with my files
+                            startActivityForResult(
+                                    new Intent(this, PickFileActivity.class), REQUEST_CODE_PICK_FROM_FILES);
+                            break;
+                        case 1:
+                            // open activity with pick from storage
+                            break;
+                    }
+                })
+                .create()
+                .show();
+
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -268,6 +337,20 @@ public class ChatRoomActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+//        if (requltCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_CODE_PICK_FROM_FILES:
+                    sendFile((FileEntityDto) data.getSerializableExtra(Extras.EXTRA_FILE_ENTITY_DTO));
+                case REQUEST_CODE_PICK_FROM_STORAGE:
+                    break;
+            }
+//        }
     }
 
     @Override

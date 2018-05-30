@@ -80,7 +80,7 @@ public class FragmentMyFiles extends Fragment {
                 .color(Color.WHITE)
                 .sizeDp(24));
 
-        mFilesAdapter = new FilesAdapter(view.getContext());
+        mFilesAdapter = new FilesAdapter(getActivity(), false);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         mRecyclerView.setAdapter(mFilesAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(),

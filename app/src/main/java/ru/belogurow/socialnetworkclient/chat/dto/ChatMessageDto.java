@@ -15,16 +15,18 @@ public class ChatMessageDto implements Serializable{
     private UUID chatRoomId;
     private Date date;
     private String text;
+    private FileEntityDto fileEntity;
 
     public ChatMessageDto() {
     }
 
-    public ChatMessageDto(UUID id, UUID authorId, UUID chatRoomId, Date date, String text) {
+    public ChatMessageDto(UUID id, UUID authorId, UUID chatRoomId, Date date, String text, FileEntityDto fileEntity) {
         this.id = id;
         this.authorId = authorId;
         this.chatRoomId = chatRoomId;
         this.date = date;
         this.text = text;
+        this.fileEntity = fileEntity;
     }
 
     public UUID getId() {
@@ -67,6 +69,14 @@ public class ChatMessageDto implements Serializable{
         this.text = text;
     }
 
+    public FileEntityDto getFileEntity() {
+        return fileEntity;
+    }
+
+    public void setFileEntity(FileEntityDto fileEntity) {
+        this.fileEntity = fileEntity;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -75,6 +85,7 @@ public class ChatMessageDto implements Serializable{
                 .append("chatRoomId", chatRoomId)
                 .append("date", date)
                 .append("text", text)
+                .append("fileEntity", fileEntity)
                 .toString();
     }
 
@@ -92,6 +103,7 @@ public class ChatMessageDto implements Serializable{
                 .append(chatRoomId, that.chatRoomId)
                 .append(date, that.date)
                 .append(text, that.text)
+                .append(fileEntity, that.fileEntity)
                 .isEquals();
     }
 
@@ -103,6 +115,7 @@ public class ChatMessageDto implements Serializable{
                 .append(chatRoomId)
                 .append(date)
                 .append(text)
+                .append(fileEntity)
                 .toHashCode();
     }
 }

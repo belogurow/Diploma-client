@@ -48,5 +48,7 @@
     <string name="dialog_file_upload_message">Add a new one?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="pick_from_my_files">Pick from my files</string>
+    <string name="pick_from_phone_storage">Pick from phone storage</string>
 
 </resources>

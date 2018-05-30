@@ -21,7 +21,6 @@ import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.util.concurrent.ExecutionException;
@@ -207,14 +206,11 @@ public class MainActivity extends AppCompatActivity {
         SecondaryDrawerItem websocketItem = new SecondaryDrawerItem()
                 .withIdentifier(4)
                 .withName("WebSocketTest")
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        navigationSelectedItem = 4;
-                        openFragment();
+                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                    navigationSelectedItem = 4;
+                    openFragment();
 
-                        return false;
-                    }
+                    return false;
                 });
 
         final Drawer drawerResult = new DrawerBuilder()

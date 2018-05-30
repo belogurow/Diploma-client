@@ -118,7 +118,7 @@ public class FragmentChat extends Fragment {
     private void initFields(View view) {
         mRecyclerView = view.findViewById(R.id.recycler_frag_chat);
         mMessageEditText = view.findViewById(R.id.frag_chat_message_input);
-        mSendMessageButton = view.findViewById(R.id.button_send_act_chat_room);
+        mSendMessageButton = view.findViewById(R.id.act_chat_room_send);
 
         mChatRoomAdapter = new ChatRoomAdapter();
         mRecyclerView.setAdapter(mChatRoomAdapter);
