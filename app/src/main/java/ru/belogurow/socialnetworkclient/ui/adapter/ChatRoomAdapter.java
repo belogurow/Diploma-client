@@ -30,6 +30,7 @@ import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
 import ru.belogurow.socialnetworkclient.chat.model.FileType;
 import ru.belogurow.socialnetworkclient.common.extra.Extras;
 import ru.belogurow.socialnetworkclient.common.web.GlideApp;
+import ru.belogurow.socialnetworkclient.ui.activity.PdfViewerActivity;
 import ru.belogurow.socialnetworkclient.ui.activity.StlViewerActivity;
 import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 
@@ -253,6 +254,10 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     stlViewer.putExtra(Extras.EXTRA_FILE_ENTITY_DTO, chatMessageDto.getFileEntity());
                     mActivity.startActivity(stlViewer);
                     break;
+                case PDF:
+                    Intent pdfViewerIntent = new Intent(mActivity, PdfViewerActivity.class);
+                    pdfViewerIntent.putExtra(Extras.EXTRA_FILE_ENTITY_DTO, chatMessageDto.getFileEntity());
+                    mActivity.startActivity(pdfViewerIntent);
                 default:
                     break;
             }

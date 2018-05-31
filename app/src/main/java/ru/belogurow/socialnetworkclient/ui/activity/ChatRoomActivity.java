@@ -338,15 +338,16 @@ public class ChatRoomActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if (data.hasExtra(Extras.EXTRA_FILE_ENTITY_DTO)) {
             switch (requestCode) {
                 case REQUEST_CODE_PICK_FROM_FILES:
                 case REQUEST_CODE_PICK_FROM_STORAGE:
                     sendFile((FileEntityDto) data.getSerializableExtra(Extras.EXTRA_FILE_ENTITY_DTO));
                     break;
-                    default:
-                        Toast.makeText(this, "Cannot load file from previous activity", Toast.LENGTH_SHORT).show();
+                default:
+                    Toast.makeText(this, "Cannot load file from previous activity", Toast.LENGTH_SHORT).show();
             }
-
+        }
     }
 
     @Override

@@ -1,7 +1,6 @@
 package ru.belogurow.socialnetworkclient.ui.activity;
 
 import android.Manifest;
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,15 +27,12 @@ import retrofit2.Response;
 import ru.belogurow.socialnetworkclient.App;
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
-import ru.belogurow.socialnetworkclient.chat.viewModel.FileViewModel;
 import ru.belogurow.socialnetworkclient.common.extra.Extras;
 
 public class StlViewerActivity extends AppCompatActivity {
 
     private static final String TAG = StlViewerActivity.class.getSimpleName();
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 1;
-
-    private FileViewModel mFileViewModel;
 
     private WebView mWebView;
     private ProgressBar mProgressBar;
@@ -49,40 +45,44 @@ public class StlViewerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stl_viewer);
 
-        FileEntityDto fileEntityDto = (FileEntityDto) getIntent().getSerializableExtra(Extras.EXTRA_FILE_ENTITY_DTO);
+        if (getIntent().hasExtra(Extras.EXTRA_FILE_ENTITY_DTO)) {
+            FileEntityDto fileEntityDto = (FileEntityDto) getIntent().getSerializableExtra(Extras.EXTRA_FILE_ENTITY_DTO);
 
-        initFields(fileEntityDto);
-        askPermissions();
+            initFields(fileEntityDto);
+            askPermissions();
 
-        // Show stl model in web view
-        Call<ResponseBody> call = App.sFileWebService.getFileById(fileEntityDto.getId());
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    try {
+            // Show stl model in web view
+            Call<ResponseBody> call = App.sFileWebService.getFileById(fileEntityDto.getId());
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+                        try {
 
-                        File path = Environment.getExternalStorageDirectory();
-                        stlFile = new File(path, fileEntityDto.getTitle() + fileEntityDto.getFileType().toString().toLowerCase());
-                        FileOutputStream fileOutputStream = new FileOutputStream(stlFile);
-                        IOUtils.write(response.body().bytes(), fileOutputStream);
+                            File path = Environment.getExternalStorageDirectory();
+                            stlFile = new File(path, fileEntityDto.getTitle() + fileEntityDto.getFileType().toString().toLowerCase());
+                            FileOutputStream fileOutputStream = new FileOutputStream(stlFile);
+                            IOUtils.write(response.body().bytes(), fileOutputStream);
 
-                        showWebView(stlFile.getAbsolutePath());
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                            showWebView(stlFile.getAbsolutePath());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            hideProgressBar();
+                        }
+                    } else {
                         hideProgressBar();
                     }
-                } else {
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(StlViewerActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                     hideProgressBar();
                 }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(StlViewerActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                hideProgressBar();
-            }
-        });
+            });
+        } else {
+            Toast.makeText(this, "Receive null data from previous activity, retry.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void initFields(FileEntityDto fileEntityDto) {
@@ -96,8 +96,6 @@ public class StlViewerActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(fileEntityDto.getTitle());
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
-        mFileViewModel = ViewModelProviders.of(this).get(FileViewModel.class);
     }
 
     private void showWebView(String stl) {

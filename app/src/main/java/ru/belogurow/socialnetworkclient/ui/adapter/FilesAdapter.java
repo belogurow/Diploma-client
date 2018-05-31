@@ -29,6 +29,7 @@ import ru.belogurow.socialnetworkclient.chat.model.FileType;
 import ru.belogurow.socialnetworkclient.common.extra.Extras;
 import ru.belogurow.socialnetworkclient.common.web.GlideApp;
 import ru.belogurow.socialnetworkclient.ui.activity.ChatRoomActivity;
+import ru.belogurow.socialnetworkclient.ui.activity.PdfViewerActivity;
 import ru.belogurow.socialnetworkclient.ui.activity.StlViewerActivity;
 
 public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder> {
@@ -81,10 +82,21 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder> 
                 result.putExtra(Extras.EXTRA_FILE_ENTITY_DTO, mFileEntityDtos.get(position));
                 mActivity.setResult(ChatRoomActivity.REQUEST_CODE_PICK_FROM_FILES, result);
                 mActivity.finish();
-            } else if (mFileEntityDtos.get(position).getFileType().equals(FileType.STL)) {
-                Intent aboutFileActivity = new Intent(v.getContext(), StlViewerActivity.class);
-                aboutFileActivity.putExtra(Extras.EXTRA_FILE_ENTITY_DTO, mFileEntityDtos.get(position));
-                v.getContext().startActivity(aboutFileActivity);
+            } else {
+                switch (mFileEntityDtos.get(position).getFileType()) {
+                    case STL:
+                        Intent stlViewerActivity = new Intent(v.getContext(), StlViewerActivity.class);
+                        stlViewerActivity.putExtra(Extras.EXTRA_FILE_ENTITY_DTO, mFileEntityDtos.get(position));
+                        v.getContext().startActivity(stlViewerActivity);
+                        break;
+                    case PDF:
+                        Intent pdfViewerIntent = new Intent(v.getContext(), PdfViewerActivity.class);
+                        pdfViewerIntent.putExtra(Extras.EXTRA_FILE_ENTITY_DTO, mFileEntityDtos.get(position));
+                        v.getContext().startActivity(pdfViewerIntent);
+                        break;
+                    default:
+                        break;
+                }
             }
 
         }
