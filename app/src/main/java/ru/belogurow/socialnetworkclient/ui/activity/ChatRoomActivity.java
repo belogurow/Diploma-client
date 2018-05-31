@@ -165,7 +165,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        mChatRoomAdapter = new ChatRoomAdapter();
+        mChatRoomAdapter = new ChatRoomAdapter(this);
         mRecyclerView.setAdapter(mChatRoomAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -238,8 +238,10 @@ public class ChatRoomActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(message -> {
                     Log.d(TAG, "Received " + message);
-                    mChatRoomAdapter.addMessage(mGson.fromJson(message.getPayload(), ChatMessageDto.class));
-//                    mChatRoomAdapter.setMessagesList(mMessages);
+                    ChatMessageDto newMessage = mGson.fromJson(message.getPayload(), ChatMessageDto.class);
+
+                    mMessages.add(newMessage);
+                    mChatRoomAdapter.addMessage(newMessage);
                     mRecyclerView.scrollToPosition(mMessages.size() - 1);
                 });
 
@@ -266,16 +268,6 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         mImageViewPickFile.setOnClickListener(v -> {
             showAlertDialog();
-
-//            mStompClient.send("/topic/chatRoom/" + chatRoomDto.getId() + "/" + currentUser.getId() + "/file", /* тут id нового файла */)
-//                    .compose(applySchedulers())
-//                    .subscribe(() -> {
-//                        Log.d(TAG, "STOMP echo send successfully");
-//                    }, throwable -> {
-//                        Log.e(TAG, "Error send STOMP echo", throwable);
-//                    });
-//
-//            mMessageEditText.getText().clear();
         });
     }
 
@@ -320,6 +312,9 @@ public class ChatRoomActivity extends AppCompatActivity {
                             break;
                         case 1:
                             // open activity with pick from storage
+                            Intent uploadFileIntent = new Intent(this, UploadFileActivity.class);
+                            uploadFileIntent.putExtra(Extras.EXTRA_FROM_CHAT, true);
+                            startActivityForResult(uploadFileIntent, REQUEST_CODE_PICK_FROM_STORAGE);
                             break;
                     }
                 })
@@ -343,14 +338,15 @@ public class ChatRoomActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-//        if (requltCode == RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_CODE_PICK_FROM_FILES:
-                    sendFile((FileEntityDto) data.getSerializableExtra(Extras.EXTRA_FILE_ENTITY_DTO));
                 case REQUEST_CODE_PICK_FROM_STORAGE:
+                    sendFile((FileEntityDto) data.getSerializableExtra(Extras.EXTRA_FILE_ENTITY_DTO));
                     break;
+                    default:
+                        Toast.makeText(this, "Cannot load file from previous activity", Toast.LENGTH_SHORT).show();
             }
-//        }
+
     }
 
     @Override

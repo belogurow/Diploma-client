@@ -20,9 +20,11 @@ import android.widget.Toast;
 import java.io.File;
 
 import ru.belogurow.socialnetworkclient.R;
+import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
 import ru.belogurow.socialnetworkclient.chat.model.FileEntity;
 import ru.belogurow.socialnetworkclient.chat.model.FileType;
 import ru.belogurow.socialnetworkclient.chat.viewModel.FileViewModel;
+import ru.belogurow.socialnetworkclient.common.extra.Extras;
 import ru.belogurow.socialnetworkclient.common.file.FileUtils;
 import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
@@ -112,7 +114,7 @@ public class UploadFileActivity extends AppCompatActivity {
                     switch (fileEntityDtoResource.getStatus()) {
                         case SUCCESS:
                             Toast.makeText(this, R.string.successful_upload, Toast.LENGTH_SHORT).show();
-                            showSuccessfulAlertDialog();
+                            getResultOfFile(fileEntityDtoResource.getData());
                             break;
                         case ERROR:
                             Toast.makeText(this, fileEntityDtoResource.getMessage(), Toast.LENGTH_LONG).show();
@@ -126,6 +128,23 @@ public class UploadFileActivity extends AppCompatActivity {
                 hideProgressBar();
             }
         });
+    }
+
+    private void getResultOfFile(FileEntityDto fileEntityDto) {
+        if (getIntent().hasExtra(Extras.EXTRA_FROM_CHAT)) {
+            boolean sendResultToChat = getIntent().getBooleanExtra(Extras.EXTRA_FROM_CHAT, false);
+
+            if (sendResultToChat) {
+                Intent result = new Intent();
+                result.putExtra(Extras.EXTRA_FILE_ENTITY_DTO, fileEntityDto);
+                setResult(ChatRoomActivity.REQUEST_CODE_PICK_FROM_STORAGE, result);
+                finish();
+            } else {
+                showSuccessfulAlertDialog();
+            }
+        } else {
+            showSuccessfulAlertDialog();
+        }
     }
 
     private void showSuccessfulAlertDialog() {

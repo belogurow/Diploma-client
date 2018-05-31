@@ -31,10 +31,10 @@
                 <ImageView
                     android:id="@+id/item_message_left_image"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="200dp"
                     android:layout_weight="1"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/empty_avatar"/>
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/item_message_left_text"
