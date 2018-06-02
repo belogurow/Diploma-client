@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.signature.ObjectKey;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
@@ -27,7 +26,6 @@ import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.chat.dto.ChatMessageDto;
 import ru.belogurow.socialnetworkclient.chat.dto.ChatRoomDto;
 import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
-import ru.belogurow.socialnetworkclient.chat.model.FileType;
 import ru.belogurow.socialnetworkclient.common.extra.Extras;
 import ru.belogurow.socialnetworkclient.common.web.GlideApp;
 import ru.belogurow.socialnetworkclient.ui.activity.PdfViewerActivity;
@@ -36,8 +34,13 @@ import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 
 public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
-    private static final Integer MY_MESSAGE = 1;
-    private static final Integer ANOTHER_MESSAGE = 2;
+    private static final Integer MY_MESSAGE_TEXT = 10;
+    private static final Integer MY_MESSAGE_IMAGE = 11;
+    private static final Integer MY_MESSAGE_FILE = 12;
+
+    private static final Integer ANOTHER_MESSAGE_TEXT = 20;
+    private static final Integer ANOTHER_MESSAGE_IMAGE = 21;
+    private static final Integer ANOTHER_MESSAGE_FILE = 22;
 
     private List<ChatMessageDto> mMessages;
     private ChatRoomDto mChatRoomDto;
@@ -75,27 +78,11 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     class ViewHolderMyMessage extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private ImageView mImageFileImageView;
-
-        private View mFileView;
-        private ImageView mFileIconImageView;
-        private TextView mFileTitleTextView;
-        private TextView mFileTypeTextView;
-        private TextView mFileDateTextView;
-
         private TextView mMessageTextView;
         private TextView mTimeTextView;
 
         ViewHolderMyMessage(View itemView) {
             super(itemView);
-
-            mFileView = itemView.findViewById(R.id.item_message_right_include_item_file);
-            mFileIconImageView = mFileView.findViewById(R.id.item_file_preview_image);
-            mFileTitleTextView = mFileView.findViewById(R.id.item_file_title_text);
-            mFileTypeTextView = mFileView.findViewById(R.id.item_file_type_text);
-            mFileDateTextView = mFileView.findViewById(R.id.item_file_date_text);
-
-            mImageFileImageView = itemView.findViewById(R.id.item_message_right_image);
 
             mMessageTextView = itemView.findViewById(R.id.item_message_right_text);
             mTimeTextView = itemView.findViewById(R.id.item_message_right_time);
@@ -109,31 +96,120 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    class ViewHolderAnotherMessage extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolderMyMessageImage extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView mImageFileImageView;
+        private TextView mTimeTextView;
 
+        ViewHolderMyMessageImage(View itemView) {
+            super(itemView);
+
+            mImageFileImageView = itemView.findViewById(R.id.item_message_image_right_image);
+            mTimeTextView = itemView.findViewById(R.id.item_message_image_right_time);
+
+            itemView.setOnClickListener(this);
+        }
+
+
+        @Override
+        public void onClick(View v) {
+            openFile(getLayoutPosition());
+        }
+    }
+
+    class ViewHolderMyMessageFile extends RecyclerView.ViewHolder implements View.OnClickListener {
         private View mFileView;
         private ImageView mFileIconImageView;
         private TextView mFileTitleTextView;
         private TextView mFileTypeTextView;
         private TextView mFileDateTextView;
 
+        private TextView mTimeTextView;
+
+        ViewHolderMyMessageFile(View itemView) {
+            super(itemView);
+
+            mFileView = itemView.findViewById(R.id.item_message_file_right_include_item_file);
+            mFileIconImageView = mFileView.findViewById(R.id.item_file_preview_image);
+            mFileTitleTextView = mFileView.findViewById(R.id.item_file_title_text);
+            mFileTypeTextView = mFileView.findViewById(R.id.item_file_type_text);
+            mFileDateTextView = mFileView.findViewById(R.id.item_file_date_text);
+
+            mTimeTextView = itemView.findViewById(R.id.item_message_file_right_time);
+
+            mFileTypeTextView.setVisibility(View.GONE);
+            mFileIconImageView.setImageDrawable(defaultFileIcon);
+
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            openFile(getLayoutPosition());
+        }
+    }
+
+    class ViewHolderAnotherMessage extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mMessageTextView;
         private TextView mTimeTextView;
 
         ViewHolderAnotherMessage(View itemView) {
             super(itemView);
 
-            mFileView = itemView.findViewById(R.id.item_message_left_include_item_file);
+            mMessageTextView = itemView.findViewById(R.id.item_message_left_text);
+            mTimeTextView = itemView.findViewById(R.id.item_message_left_time);
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            openFile(getLayoutPosition());
+        }
+    }
+
+    class ViewHolderAnotherMessageImage extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private ImageView mImageFileImageView;
+        private TextView mTimeTextView;
+
+        public ViewHolderAnotherMessageImage(View itemView) {
+            super(itemView);
+
+            mImageFileImageView = itemView.findViewById(R.id.item_message_image_left_image);
+            mTimeTextView = itemView.findViewById(R.id.item_message_image_left_time);
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            openFile(getLayoutPosition());
+        }
+    }
+
+    class ViewHolderAnotherMessageFile extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private View mFileView;
+        private ImageView mFileIconImageView;
+        private TextView mFileTitleTextView;
+        private TextView mFileTypeTextView;
+        private TextView mFileDateTextView;
+
+        private TextView mTimeTextView;
+
+        public ViewHolderAnotherMessageFile(View itemView) {
+            super(itemView);
+
+            mFileView = itemView.findViewById(R.id.item_message_file_left_include_item_file);
             mFileIconImageView = mFileView.findViewById(R.id.item_file_preview_image);
             mFileTitleTextView = mFileView.findViewById(R.id.item_file_title_text);
             mFileTypeTextView = mFileView.findViewById(R.id.item_file_type_text);
             mFileDateTextView = mFileView.findViewById(R.id.item_file_date_text);
 
-            mImageFileImageView = itemView.findViewById(R.id.item_message_left_image);
+            mTimeTextView = itemView.findViewById(R.id.item_message_file_left_time);
 
-            mMessageTextView = itemView.findViewById(R.id.item_message_left_text);
-            mTimeTextView = itemView.findViewById(R.id.item_message_left_time);
+            mFileTypeTextView.setVisibility(View.GONE);
+            mFileIconImageView.setImageDrawable(defaultFileIcon);
+
 
             itemView.setOnClickListener(this);
         }
@@ -150,9 +226,31 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         if (currentUser.equalsById(mChatRoomDto.getFirstUser()) || currentUser.equalsById(mChatRoomDto.getSecondUser())) {
             if (message.getAuthorId().equals(currentUser.getId())) {
-                return MY_MESSAGE;
+                if (message.getFileEntity() == null) {
+                    return MY_MESSAGE_TEXT;
+                } else {
+                    FileEntityDto fileEntityDto = message.getFileEntity();
+
+                    switch (fileEntityDto.getFileType()) {
+                        case JPG:
+                            return MY_MESSAGE_IMAGE;
+                        default:
+                            return MY_MESSAGE_FILE;
+                    }
+                }
             } else {
-                return ANOTHER_MESSAGE;
+                if (message.getFileEntity() == null) {
+                    return ANOTHER_MESSAGE_TEXT;
+                } else {
+                    FileEntityDto fileEntityDto = message.getFileEntity();
+
+                    switch (fileEntityDto.getFileType()) {
+                        case JPG:
+                            return ANOTHER_MESSAGE_IMAGE;
+                        default:
+                            return ANOTHER_MESSAGE_FILE;
+                    }
+                }
             }
         }
         return -1;
@@ -161,14 +259,26 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (viewType == MY_MESSAGE) {
+        if (viewType == MY_MESSAGE_TEXT) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right, parent, false);
             return new ViewHolderMyMessage(view);
-        } else if (viewType == ANOTHER_MESSAGE) {
+        } else if (viewType == ANOTHER_MESSAGE_TEXT) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left, parent, false);
             return new ViewHolderAnotherMessage(view);
+        } else if (viewType == MY_MESSAGE_IMAGE) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_image_right, parent, false);
+            return new ViewHolderMyMessageImage(view);
+        } else if (viewType == ANOTHER_MESSAGE_IMAGE) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_image_left, parent, false);
+            return new ViewHolderAnotherMessageImage(view);
+        } else if (viewType == MY_MESSAGE_FILE) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_file_right, parent, false);
+            return new ViewHolderMyMessageFile(view);
+        } else if (viewType == ANOTHER_MESSAGE_FILE) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_file_left, parent, false);
+            return new ViewHolderAnotherMessageFile(view);
         } else {
-            throw new RuntimeException("The type has to be MY_MESSAGE or ANOTHER_MESSAGE");
+            throw new RuntimeException("The type has to be MY_MESSAGE_TEXT or ANOTHER_MESSAGE_TEXT");
         }
     }
 
@@ -177,69 +287,70 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         ChatMessageDto message = mMessages.get(position);
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
 
-        if (holder.getItemViewType() == MY_MESSAGE) {
+        if (holder.getItemViewType() == MY_MESSAGE_TEXT) {
             // my message
             ViewHolderMyMessage holderMyMessage = (ViewHolderMyMessage) holder;
+
             holderMyMessage.mTimeTextView.setText(dateFormat.format(message.getDate()));
+            holderMyMessage.mMessageTextView.setText(message.getText());
 
-            if (message.getFileEntity() == null) {
-                holderMyMessage.mMessageTextView.setText(message.getText());
-                holderMyMessage.mMessageTextView.setVisibility(View.VISIBLE);
-            } else {
-                FileEntityDto fileEntityDto = message.getFileEntity();
-                if (fileEntityDto.getFileType().equals(FileType.JPG)) {
-                    setImageWithGlideRight(holderMyMessage, fileEntityDto);
-                    holderMyMessage.mImageFileImageView.setVisibility(View.VISIBLE);
-                } else {
-                    holderMyMessage.mFileIconImageView.setImageDrawable(defaultFileIcon);
-                    holderMyMessage.mFileTitleTextView.setText(fileEntityDto.getTitle());
-                    holderMyMessage.mFileDateTextView.setText(fileEntityDto.getFileType().toString().toUpperCase());
-                    holderMyMessage.mFileTypeTextView.setVisibility(View.GONE);
-                    holderMyMessage.mFileView.setVisibility(View.VISIBLE);
-                }
-            }
-        } else {
+        } else if (holder.getItemViewType() == MY_MESSAGE_IMAGE) {
+            // my message image
+            ViewHolderMyMessageImage holderMyMessageImage = (ViewHolderMyMessageImage) holder;
+
+            holderMyMessageImage.mTimeTextView.setText(dateFormat.format(message.getDate()));
+            setImageWithGlideRight(holderMyMessageImage, message.getFileEntity());
+
+        } else if (holder.getItemViewType() == MY_MESSAGE_FILE) {
+            // my message file
+            ViewHolderMyMessageFile viewHolderMyMessageFile = (ViewHolderMyMessageFile) holder;
+            FileEntityDto fileEntityDto = message.getFileEntity();
+
+            viewHolderMyMessageFile.mFileTitleTextView.setText(fileEntityDto.getTitle());
+            viewHolderMyMessageFile.mFileDateTextView.setText(fileEntityDto.getFileType().toString().toUpperCase());
+            viewHolderMyMessageFile.mTimeTextView.setText(dateFormat.format(message.getDate()));
+
+        } else if (holder.getItemViewType() == ANOTHER_MESSAGE_TEXT) {
             // another message
-            ViewHolderAnotherMessage holderAnotherMessage = (ViewHolderAnotherMessage) holder;
-            holderAnotherMessage.mTimeTextView.setText(dateFormat.format(message.getDate()));
+            ViewHolderAnotherMessage viewHolderAnotherMessage = (ViewHolderAnotherMessage) holder;
 
-            if (message.getFileEntity() == null) {
-                holderAnotherMessage.mMessageTextView.setText(message.getText());
-                holderAnotherMessage.mMessageTextView.setVisibility(View.VISIBLE);
-            } else {
-                FileEntityDto fileEntityDto = message.getFileEntity();
-                if (fileEntityDto.getFileType().equals(FileType.JPG)) {
-                    setImageWithGlideLeft(holderAnotherMessage, fileEntityDto);
-                    holderAnotherMessage.mImageFileImageView.setVisibility(View.VISIBLE);
-                } else {
-                    holderAnotherMessage.mFileIconImageView.setImageDrawable(defaultFileIcon);
-                    holderAnotherMessage.mFileTitleTextView.setText(fileEntityDto.getTitle());
-                    holderAnotherMessage.mFileDateTextView.setText(fileEntityDto.getFileType().toString().toUpperCase());
-                    holderAnotherMessage.mFileTypeTextView.setVisibility(View.GONE);
-                    holderAnotherMessage.mFileView.setVisibility(View.VISIBLE);
-                }
-            }
+            viewHolderAnotherMessage.mTimeTextView.setText(dateFormat.format(message.getDate()));
+            viewHolderAnotherMessage.mMessageTextView.setText(message.getText());
+
+        } else if (holder.getItemViewType() == ANOTHER_MESSAGE_IMAGE) {
+            // another message image
+            ViewHolderAnotherMessageImage holderAnotherMessageImage = (ViewHolderAnotherMessageImage) holder;
+
+            holderAnotherMessageImage.mTimeTextView.setText(dateFormat.format(message.getDate()));
+            setImageWithGlideLeft(holderAnotherMessageImage, message.getFileEntity());
+
+        } else if (holder.getItemViewType() == ANOTHER_MESSAGE_FILE) {
+            // another message file
+            ViewHolderAnotherMessageFile holderAnotherMessageFile = (ViewHolderAnotherMessageFile) holder;
+            FileEntityDto fileEntityDto = message.getFileEntity();
+
+            holderAnotherMessageFile.mFileTitleTextView.setText(fileEntityDto.getTitle());
+            holderAnotherMessageFile.mFileDateTextView.setText(fileEntityDto.getFileType().toString().toUpperCase());
+            holderAnotherMessageFile.mTimeTextView.setText(dateFormat.format(message.getDate()));
         }
     }
 
-    private void setImageWithGlideLeft(ViewHolderAnotherMessage holder, FileEntityDto file) {
+    private void setImageWithGlideLeft(ViewHolderAnotherMessageImage holder, FileEntityDto file) {
         GlideApp.with(holder.itemView.getContext())
                 .load(App.BASE_URL + file.getDataUrl())
-                .centerCrop()
                 .transition(DrawableTransitionOptions.withCrossFade())
 //                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .signature(new ObjectKey(file.getDataUrl()))
+//                .signature(new ObjectKey(file.getDataUrl()))
                 .error(defaultFileIcon)
                 .into(holder.mImageFileImageView);
     }
 
-    private void setImageWithGlideRight(ViewHolderMyMessage holder, FileEntityDto file) {
+    private void setImageWithGlideRight(ViewHolderMyMessageImage holder, FileEntityDto file) {
         GlideApp.with(holder.itemView.getContext())
                 .load(App.BASE_URL + file.getDataUrl())
-                .centerCrop()
                 .transition(DrawableTransitionOptions.withCrossFade())
 //                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .signature(new ObjectKey(file.getDataUrl()))
+//                .signature(new ObjectKey(file.getDataUrl()))
                 .error(defaultFileIcon)
                 .into(holder.mImageFileImageView);
     }
