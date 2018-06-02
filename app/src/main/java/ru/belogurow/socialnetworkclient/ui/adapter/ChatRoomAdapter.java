@@ -28,9 +28,12 @@ import ru.belogurow.socialnetworkclient.chat.dto.ChatRoomDto;
 import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
 import ru.belogurow.socialnetworkclient.common.extra.Extras;
 import ru.belogurow.socialnetworkclient.common.web.GlideApp;
+import ru.belogurow.socialnetworkclient.ui.activity.ImageViewerActivity;
 import ru.belogurow.socialnetworkclient.ui.activity.PdfViewerActivity;
 import ru.belogurow.socialnetworkclient.ui.activity.StlViewerActivity;
 import ru.belogurow.socialnetworkclient.users.dto.UserDto;
+
+//import ru.belogurow.socialnetworkclient.ui.activity.ImageViewerActivity;
 
 public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
@@ -369,6 +372,12 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     Intent pdfViewerIntent = new Intent(mActivity, PdfViewerActivity.class);
                     pdfViewerIntent.putExtra(Extras.EXTRA_FILE_ENTITY_DTO, chatMessageDto.getFileEntity());
                     mActivity.startActivity(pdfViewerIntent);
+                    break;
+                case JPG:
+                    Intent imageViewerIntent = new Intent(mActivity, ImageViewerActivity.class);
+                    imageViewerIntent.putExtra(Extras.EXTRA_FILE_ENTITY_DTO, chatMessageDto.getFileEntity());
+                    mActivity.startActivity(imageViewerIntent);
+                    break;
                 default:
                     break;
             }

@@ -45,6 +45,8 @@
         </activity>
         <activity android:name=".ui.activity.PdfViewerActivity">
         </activity>
+        <activity android:name=".ui.activity.ImageViewerActivity">
+        </activity>
     </application>
 
 </manifest>
