@@ -201,15 +201,22 @@ public class UploadFileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_FILE && resultCode == Activity.RESULT_OK) {
-            if (data == null ) {
-                Toast.makeText(this, R.string.cannot_pick_file, Toast.LENGTH_SHORT).show();
-                return;
+        if (data != null && requestCode == PICK_FILE && resultCode == Activity.RESULT_OK) {
+            File tempFile = FileUtils.openPath(this, data.getData());
+
+            long sizeInMb = tempFile.length() / (1024 * 1024);
+            if (sizeInMb < 10) {
+                choosenFile = FileUtils.openPath(this, data.getData());
+                mUploadButton.setEnabled(true);
+            } else {
+                deleteFile();
+                choosenFile = null;
+                mUploadButton.setEnabled(false);
+                Toast.makeText(this, R.string.file_size_10MB, Toast.LENGTH_SHORT).show();
             }
 
-            choosenFile = FileUtils.openPath(this, data.getData());
-            mUploadButton.setEnabled(true);
-
+        } else {
+            Toast.makeText(this, R.string.cannot_pick_file, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -222,5 +229,18 @@ public class UploadFileActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        deleteFile();
+    }
+
+    private void deleteFile() {
+        if (choosenFile != null && choosenFile.exists()) {
+            choosenFile.delete();
+        }
     }
 }

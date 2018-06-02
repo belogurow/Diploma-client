@@ -50,5 +50,6 @@
     <string name="no">No</string>
     <string name="pick_from_my_files">Pick from my files</string>
     <string name="pick_from_phone_storage">Pick from phone storage</string>
+    <string name="file_size_10MB">File size exceeds 10MB</string>
 
 </resources>
