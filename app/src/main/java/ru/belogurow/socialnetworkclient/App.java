@@ -15,6 +15,7 @@ import ru.belogurow.socialnetworkclient.di.AppComponent;
 import ru.belogurow.socialnetworkclient.di.AppModule;
 import ru.belogurow.socialnetworkclient.di.DaggerAppComponent;
 import ru.belogurow.socialnetworkclient.di.DatabaseModule;
+import ru.belogurow.socialnetworkclient.users.service.FavoriteUsersWebService;
 import ru.belogurow.socialnetworkclient.users.service.UserWebService;
 import ru.belogurow.socialnetworkclient.web.SelfSigningClientBuilder;
 
@@ -31,10 +32,11 @@ public class App extends Application {
     public static final String BASE_URL = "https://" + URL;
     public static final String BASE_WEB_SOCKET_URL = "wss://" + URL;
 
-    private static  AppComponent sComponent;
+    private static AppComponent sComponent;
     public static UserWebService sWebUserService;
     public static ChatWebService sChatWebService;
     public static FileWebService sFileWebService;
+    public static FavoriteUsersWebService sFavoriteUsersWebService;
 
     @Override
     public void onCreate() {
@@ -60,6 +62,7 @@ public class App extends Application {
         sWebUserService = retrofit.create(UserWebService.class);
         sChatWebService = retrofit.create(ChatWebService.class);
         sFileWebService = retrofit.create(FileWebService.class);
+        sFavoriteUsersWebService = retrofit.create(FavoriteUsersWebService.class);
     }
 
     private void initDagger() {

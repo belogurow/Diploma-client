@@ -165,6 +165,7 @@ public class UploadFileActivity extends AppCompatActivity {
     }
 
     private void clearFields() {
+        deleteFile();
         choosenFile = null;
         mUploadButton.setEnabled(false);
         mTitleTextInput.getEditText().setText("");

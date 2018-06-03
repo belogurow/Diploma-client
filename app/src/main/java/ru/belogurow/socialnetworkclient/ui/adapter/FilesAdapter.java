@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.signature.ObjectKey;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
@@ -136,10 +135,10 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder> 
         if (file.getFileType().equals(FileType.JPG)) {
             GlideApp.with(viewHolder.itemView.getContext())
                     .load(App.BASE_URL + file.getDataUrl())
-                    .fitCenter()
+//                    .fitCenter()
                     .transition(DrawableTransitionOptions.withCrossFade())
 //                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                    .signature(new ObjectKey(file.getDataUrl()))
+//                    .signature(new ObjectKey(file.getDataUrl()))
                     .error(defaultFileIcon)
                     .into(viewHolder.mFilePreviewImageView);
         }

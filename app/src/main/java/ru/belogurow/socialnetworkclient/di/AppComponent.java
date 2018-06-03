@@ -11,7 +11,9 @@ import ru.belogurow.socialnetworkclient.chat.viewModel.ChatViewModel;
 import ru.belogurow.socialnetworkclient.chat.viewModel.FileViewModel;
 import ru.belogurow.socialnetworkclient.users.dao.UserDao;
 import ru.belogurow.socialnetworkclient.users.repository.LocalUserRepository;
+import ru.belogurow.socialnetworkclient.users.repository.RemoteFavoriteUsersRepository;
 import ru.belogurow.socialnetworkclient.users.repository.RemoteUserRepository;
+import ru.belogurow.socialnetworkclient.users.viewModel.FavoriteUsersViewModel;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 
 
@@ -26,6 +28,8 @@ public interface AppComponent {
     RemoteChatRepository getRemoteChatRepository();
 
     RemoteFileRepository getRemoteFileRepository();
+
+    RemoteFavoriteUsersRepository getRemoteFavoriteUsersRepository();
 
     AppDatabase getAppDatabase();
 
@@ -42,6 +46,8 @@ public interface AppComponent {
     void inject(ChatViewModel chatViewModel);
 
     void inject(FileViewModel fileViewModel);
+
+    void inject(FavoriteUsersViewModel favoriteUsersViewModel);
 
     void inject(App app);
 

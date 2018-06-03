@@ -20,7 +20,6 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.util.concurrent.ExecutionException;
@@ -29,12 +28,11 @@ import ru.belogurow.socialnetworkclient.App;
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
 import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
-import ru.belogurow.socialnetworkclient.ui.fragment.FragmentChat;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentDialogs;
+import ru.belogurow.socialnetworkclient.ui.fragment.FragmentFavoriteUsersList;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentMyFiles;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentMyProfile;
 import ru.belogurow.socialnetworkclient.ui.fragment.FragmentUserList;
-import ru.belogurow.socialnetworkclient.ui.fragment.FragmentUserProfile;
 import ru.belogurow.socialnetworkclient.users.dto.UserDto;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 
@@ -44,11 +42,10 @@ public class MainActivity extends AppCompatActivity {
     private UserViewModel mUserViewModel;
 
     private Fragment fragmentUserList;
-    private Fragment fragmentUserProfile;
+    private Fragment fragmentFavoriteUsersList;
     private Fragment fragmentMyProfile;
     private Fragment fragmentDialogs;
     private Fragment fragmentMyFiles;
-    private Fragment fragmentWebSocketTest;
 
     private ProfileDrawerItem mProfileDrawerItem;
     private AccountHeader mAccountHeader;
@@ -74,12 +71,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void initFragments() {
         fragmentUserList = new FragmentUserList();
-        fragmentUserProfile = new FragmentUserProfile();
+        fragmentFavoriteUsersList = new FragmentFavoriteUsersList();
         fragmentMyProfile = new FragmentMyProfile();
         fragmentDialogs = new FragmentDialogs();
         fragmentMyFiles = new FragmentMyFiles();
-
-        fragmentWebSocketTest = new FragmentChat();
 
         mToolbar = findViewById(R.id.toolbar_main_activity);
         setSupportActionBar(mToolbar);
@@ -168,50 +163,42 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 });
 
-        PrimaryDrawerItem dialogs = new PrimaryDrawerItem()
+        PrimaryDrawerItem favoriteUsers = new PrimaryDrawerItem()
                 .withIdentifier(2)
-                .withName(R.string.dialogs)
-                .withIcon(FontAwesome.Icon.faw_comment2)
+                .withName(R.string.favorite_users)
+                .withIcon(FontAwesome.Icon.faw_star2)
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
-                    mToolbar.setTitle(R.string.dialogs);
+                    mToolbar.setTitle(R.string.favorite_users);
                     navigationSelectedItem = 2;
                     openFragment();
 
                     return false;
                 });
 
-        PrimaryDrawerItem files = new PrimaryDrawerItem()
+        PrimaryDrawerItem dialogs = new PrimaryDrawerItem()
                 .withIdentifier(3)
+                .withName(R.string.dialogs)
+                .withIcon(FontAwesome.Icon.faw_comment2)
+                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                    mToolbar.setTitle(R.string.dialogs);
+                    navigationSelectedItem = 3;
+                    openFragment();
+
+                    return false;
+                });
+
+        PrimaryDrawerItem files = new PrimaryDrawerItem()
+                .withIdentifier(4)
                 .withName(R.string.my_files)
                 .withIcon(FontAwesome.Icon.faw_file2)
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     mToolbar.setTitle(R.string.my_files);
-                    navigationSelectedItem = 3;
-                    openFragment();
-
-                    return false;
-                });
-
-        SecondaryDrawerItem elseItem = new SecondaryDrawerItem()
-                .withIdentifier(3)
-                .withName(R.string.else_field)
-                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
-                    mToolbar.setTitle(R.string.else_field);
-                    navigationSelectedItem = 3;
-                    openFragment();
-
-                    return false;
-                });
-
-        SecondaryDrawerItem websocketItem = new SecondaryDrawerItem()
-                .withIdentifier(4)
-                .withName("WebSocketTest")
-                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     navigationSelectedItem = 4;
                     openFragment();
 
                     return false;
                 });
+
 
         final Drawer drawerResult = new DrawerBuilder()
                 .withActivity(this)
@@ -222,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
                 .addDrawerItems(
                         myProfile,
                         users,
+                        favoriteUsers,
                         dialogs,
                         files,
                         new DividerDrawerItem()
@@ -250,11 +238,17 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 2:
                 getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_acitivity_container, fragmentFavoriteUsersList)
+                        .addToBackStack("FAVORITE_USERS_LIST")
+                        .commit();
+                break;
+            case 3:
+                getSupportFragmentManager().beginTransaction()
                         .replace(R.id.main_acitivity_container, fragmentDialogs)
                         .addToBackStack("DIALOGS")
                         .commit();
                 break;
-            case 3:
+            case 4:
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.main_acitivity_container, fragmentMyFiles)
                         .addToBackStack("MY_FILES")
