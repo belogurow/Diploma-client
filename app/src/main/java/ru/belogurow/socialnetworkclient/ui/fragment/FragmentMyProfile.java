@@ -117,7 +117,9 @@ public class FragmentMyProfile extends Fragment {
             mUserViewModel.deleteAllDB();
 
             getActivity().finish();
-            startActivity(new Intent(getActivity(), LoginActivity.class));
+            Intent loginIntent = new Intent(v.getContext(), LoginActivity.class);
+            loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(loginIntent);
         });
     }
 
