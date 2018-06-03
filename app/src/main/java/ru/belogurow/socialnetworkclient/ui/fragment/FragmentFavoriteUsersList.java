@@ -71,6 +71,7 @@ public class FragmentFavoriteUsersList extends Fragment {
                             switch (listResource.getStatus()) {
                                 case SUCCESS:
                                     if (listResource.getData().isEmpty()) {
+                                        mUsersAdapter.setUserList(new ArrayList<>());
                                         Toast.makeText(getContext(), R.string.list_is_empty, Toast.LENGTH_SHORT).show();
                                     } else {
                                         List<UserDto> users = new ArrayList<>();

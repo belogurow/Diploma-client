@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.ui.adapter.UsersListAdapter;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
@@ -68,6 +70,7 @@ public class FragmentUserList extends Fragment {
             switch (listResource.getStatus()) {
                 case SUCCESS:
                     if (listResource.getData().isEmpty()) {
+                        mUsersAdapter.setUserList(new ArrayList<>());
                         Toast.makeText(getContext(), R.string.list_is_empty, Toast.LENGTH_SHORT).show();
                     } else {
                         mUsersAdapter.setUserList(listResource.getData());

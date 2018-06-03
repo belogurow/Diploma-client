@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.chat.viewModel.ChatViewModel;
 import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
@@ -68,6 +70,7 @@ public class FragmentDialogs extends Fragment {
 
             if (userResource != null && userResource.getStatus() == NetworkStatus.SUCCESS) {
                 currentUser = userResource.getData();
+                mDialogsAdapter.setCurrentUser(currentUser);
 
                 mChatViewModel.getAllChatsByUserId(currentUser.getId()).observe(this, chatResource -> {
                     if (chatResource == null) {
@@ -79,10 +82,10 @@ public class FragmentDialogs extends Fragment {
                     switch (chatResource.getStatus()) {
                         case SUCCESS:
                             if (chatResource.getData().isEmpty()) {
+                                mDialogsAdapter.setChatList(new ArrayList<>());
                                 Toast.makeText(getContext(), R.string.list_is_empty, Toast.LENGTH_SHORT).show();
                             } else {
                                 mDialogsAdapter.setChatList(chatResource.getData());
-                                mDialogsAdapter.setCurrentUser(currentUser);
                             }
                             break;
                         case ERROR:

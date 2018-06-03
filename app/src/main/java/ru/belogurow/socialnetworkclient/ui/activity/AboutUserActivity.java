@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.signature.ObjectKey;
@@ -28,11 +29,14 @@ import ru.belogurow.socialnetworkclient.chat.model.FileType;
 import ru.belogurow.socialnetworkclient.common.extra.Extras;
 import ru.belogurow.socialnetworkclient.common.web.GlideApp;
 import ru.belogurow.socialnetworkclient.users.dto.UserDto;
+import ru.belogurow.socialnetworkclient.users.model.FavoriteUsers;
+import ru.belogurow.socialnetworkclient.users.viewModel.FavoriteUsersViewModel;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 
 public class AboutUserActivity extends AppCompatActivity {
 
     private UserViewModel mUserViewModel;
+    private FavoriteUsersViewModel mFavoriteUsersViewModel;
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ImageView mUserAvatarImageView;
@@ -40,9 +44,14 @@ public class AboutUserActivity extends AppCompatActivity {
     private TextView mUsernameTextView;
     private Button mAddFriendButton;
     private Button mStartDialogButton;
+    private ToggleButton mFavUserToggleButton;
     private Toolbar mToolbar;
 
     private Drawable defaultUserIcon;
+    private Drawable starIcon;
+    private Drawable emptyStarIcon;
+
+    private UserDto currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,15 +77,57 @@ public class AboutUserActivity extends AppCompatActivity {
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             loadUserInfo(userId);
+            loadIsFavUser(userId);
             hideProgressBar();
         });
+
+        mFavUserToggleButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                mFavUserToggleButton.setBackgroundDrawable(starIcon);
+                addUserToFavorite(userId);
+            } else {
+
+                mFavUserToggleButton.setBackgroundDrawable(emptyStarIcon);
+                deleteUserFromFavorite(userId);
+            }
+        });
+
+//        mFavUserRatingBar.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (mFavUserRatingBar.getRating() == 0) {
+//                    mFavUserRatingBar.setRating(1);
+//                } else if (mFavUserRatingBar.getRating() == 1) {
+//                    mFavUserRatingBar.setRating(0);
+//                }
+//            }
+//        });
+//
+//        mFavUserRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+//            @Override
+//            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+//                if (fromUser) {
+//                    if (rating == 1) {
+//                        addUserToFavorite(userId);
+//                    } else if (rating == 0) {
+//                        deleteUserFromFavorite(userId);
+//                    }
+//                }
+//            }
+//        });
     }
 
     private void loadUserFromDB(UUID userId) {
         mUserViewModel.userFromDB().observe(this, userDtoResource -> {
-            if (userDtoResource != null && !userDtoResource.getData().getId().equals(userId)) {
-                mAddFriendButton.setEnabled(true);
-                mStartDialogButton.setEnabled(true);
+            if (userDtoResource != null) {
+                currentUser = userDtoResource.getData();
+                loadIsFavUser(userId);
+
+                if (!userDtoResource.getData().getId().equals(userId)) {
+                    mAddFriendButton.setEnabled(true);
+                    mStartDialogButton.setEnabled(true);
+                    mFavUserToggleButton.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
@@ -93,14 +144,14 @@ public class AboutUserActivity extends AppCompatActivity {
 
             switch (userResource.getStatus()) {
                 case SUCCESS:
-                    UserDto currentUser = userResource.getData();
+                    UserDto showedUser = userResource.getData();
 
-                    mFullnameTextView.setText(currentUser.getName());
-                    mUsernameTextView.setText(currentUser.getUsername());
+                    mFullnameTextView.setText(showedUser.getName());
+                    mUsernameTextView.setText(showedUser.getUsername());
 
                     // Set avatar image
-                    if (currentUser.getUserProfile() != null && currentUser.getUserProfile().getAvatarFile() != null) {
-                        setImageWithGlide(currentUser.getUserProfile().getAvatarFile());
+                    if (showedUser.getUserProfile() != null && showedUser.getUserProfile().getAvatarFile() != null) {
+                        setImageWithGlide(showedUser.getUserProfile().getAvatarFile());
                     }
 
                     break;
@@ -115,6 +166,74 @@ public class AboutUserActivity extends AppCompatActivity {
         });
     }
 
+    private void loadIsFavUser(UUID userId) {
+        mFavoriteUsersViewModel.isFromUserIdHasFavToUserId(currentUser.getId(), userId).observe(this, result -> {
+            if (result != null) {
+                switch (result.getStatus()) {
+                    case SUCCESS:
+                        if (result.getData()) {
+                            mFavUserToggleButton.setChecked(true);
+                            mFavUserToggleButton.setBackgroundDrawable(starIcon);
+                        } else {
+                            mFavUserToggleButton.setChecked(false);
+                            mFavUserToggleButton.setBackgroundDrawable(emptyStarIcon);
+                        }
+                        break;
+                    case ERROR:
+                        Toast.makeText(AboutUserActivity.this, result.getMessage(), Toast.LENGTH_LONG).show();
+                        break;
+                    default:
+                        Toast.makeText(AboutUserActivity.this, R.string.received_null_data, Toast.LENGTH_LONG).show();
+                }
+            } else {
+                Toast.makeText(this, "Cannot receive information about favorite user", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void addUserToFavorite(UUID userId) {
+        FavoriteUsers favoriteUsers = new FavoriteUsers(currentUser.getId(), userId);
+        mFavoriteUsersViewModel.addToFavoriteUsers(favoriteUsers).observe(this, favoriteUsersDtoResource -> {
+            if (favoriteUsersDtoResource == null) {
+                Toast.makeText(this, R.string.received_null_data, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            switch (favoriteUsersDtoResource.getStatus()) {
+                case SUCCESS:
+//                    Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show();
+                    break;
+                case ERROR:
+                    Toast.makeText(AboutUserActivity.this, favoriteUsersDtoResource.getMessage(), Toast.LENGTH_LONG).show();
+                    break;
+                default:
+                    Toast.makeText(AboutUserActivity.this, R.string.received_null_data, Toast.LENGTH_LONG).show();
+            }
+
+        });
+    }
+
+    private void deleteUserFromFavorite(UUID userId) {
+        mFavoriteUsersViewModel.deleteFromUserIdFavForToUserId(currentUser.getId(), userId).observe(this, booleanResource -> {
+            if (booleanResource == null) {
+                Toast.makeText(this, R.string.received_null_data, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            switch (booleanResource.getStatus()) {
+                case SUCCESS:
+                    Toast.makeText(this, "Removed from favorites", Toast.LENGTH_SHORT).show();
+                    break;
+                case ERROR:
+                    Toast.makeText(AboutUserActivity.this, booleanResource.getMessage(), Toast.LENGTH_LONG).show();
+                    break;
+                default:
+                    Toast.makeText(AboutUserActivity.this, R.string.received_null_data, Toast.LENGTH_LONG).show();
+            }
+
+        });
+    }
+
     private void initFields() {
         View itemUserView = findViewById(R.id.include_about_user);
 
@@ -123,12 +242,24 @@ public class AboutUserActivity extends AppCompatActivity {
                 .color(getResources().getColor(R.color.md_grey_500))
                 .sizeDp(48);
 
+        starIcon = new IconicsDrawable(this)
+                .icon(FontAwesome.Icon.faw_star2)
+                .color(getResources().getColor(R.color.colorSecondaryLight))
+                .sizeDp(48);
+
+        emptyStarIcon = new IconicsDrawable(this)
+                .icon(FontAwesome.Icon.faw_star)
+                .color(getResources().getColor(R.color.colorSecondaryLight))
+                .sizeDp(48);
+
         mUserAvatarImageView = itemUserView.findViewById(R.id.item_user_avatar_imageView);
         mUserAvatarImageView.setImageDrawable(defaultUserIcon);
 
         mSwipeRefreshLayout = findViewById(R.id.act_about_user_swipelayout);
         mFullnameTextView = itemUserView.findViewById(R.id.item_user_fullname_textView);
         mUsernameTextView = itemUserView.findViewById(R.id.item_user_username_textView);
+        mFavUserToggleButton = itemUserView.findViewById(R.id.item_user_toggle_button);
+        mFavUserToggleButton.setVisibility(View.GONE);
         mAddFriendButton = findViewById(R.id.button_add_friend_act_about_user);
         mAddFriendButton.setEnabled(false);
         mStartDialogButton = findViewById(R.id.button_start_dialog_act_about_user);
@@ -142,6 +273,7 @@ public class AboutUserActivity extends AppCompatActivity {
         }
 
         mUserViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+        mFavoriteUsersViewModel = ViewModelProviders.of(this).get(FavoriteUsersViewModel.class);
     }
 
     private void setImageWithGlide(FileEntityDto avatarFile) {

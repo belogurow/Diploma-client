@@ -21,6 +21,8 @@ import android.widget.Toast;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import java.util.ArrayList;
+
 import ru.belogurow.socialnetworkclient.R;
 import ru.belogurow.socialnetworkclient.chat.viewModel.FileViewModel;
 import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
@@ -116,6 +118,7 @@ public class FragmentMyFiles extends Fragment {
                     switch (fileResource.getStatus()) {
                         case SUCCESS:
                             if (fileResource.getData().isEmpty()) {
+                                mFilesAdapter.setFileEntityDtos(new ArrayList<>());
                                 Toast.makeText(getContext(), R.string.list_is_empty, Toast.LENGTH_SHORT).show();
                             } else {
                                 mFilesAdapter.setFileEntityDtos(fileResource.getData());
