@@ -14,10 +14,11 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/fullname_signup_textinput"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.100000024"
-        app:layout_constraintVertical_chainStyle="packed">
+        app:layout_constraintVertical_bias="0.65999997"
+        app:layout_constraintVertical_chainStyle="spread">
 
         <android.support.design.widget.TextInputEditText
             android:layout_width="match_parent"
@@ -32,6 +33,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/password_signup_textinput"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/username_signup_textinput">
 
@@ -47,8 +49,9 @@
         style="@style/marginCenterPosition"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/signup_button"
+        app:layout_constraintBottom_toTopOf="@+id/profession_signup_textinput"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fullname_signup_textinput">
 
@@ -56,32 +59,125 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/password"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"/>
     </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/profession_signup_textinput"
+        style="@style/marginCenterPosition"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/description_signup_textinput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/password_signup_textinput">
+
+        <android.support.design.widget.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/profession"
+            android:inputType="textCapSentences"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/description_signup_textinput"
+        style="@style/marginCenterPosition"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/birthdate_signup_textinput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profession_signup_textinput">
+
+        <android.support.design.widget.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/description"
+            android:inputType="textCapSentences"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/birthdate_signup_textinput"
+        style="@style/marginCenterPosition"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/pick_doctor_singup_togglebutton"
+        app:layout_constraintEnd_toStartOf="@+id/pick_birthdate_singup_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/description_signup_textinput">
+
+        <android.support.design.widget.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/birth_date"
+            android:inputType="date"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/pick_birthdate_singup_button"
+        style="@style/marginCenterPosition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background_selector"
+        android:text="@string/pick"
+        android:textAllCaps="false"
+        android:textColor="@color/button_text"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/birthdate_signup_textinput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/birthdate_signup_textinput"
+        app:layout_constraintTop_toTopOf="@+id/birthdate_signup_textinput"/>
+
+    <ToggleButton
+        android:id="@+id/pick_doctor_singup_togglebutton"
+        style="@style/marginCenterPosition"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:textOff="@string/doctor"
+        android:textOn="@string/doctor"
+        app:layout_constraintEnd_toStartOf="@+id/pick_patient_singup_togglebutton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/birthdate_signup_textinput"/>
+
+    <ToggleButton
+        android:id="@+id/pick_patient_singup_togglebutton"
+        style="@style/marginCenterPosition"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:textOff="@string/patient"
+        android:textOn="@string/patient"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/pick_doctor_singup_togglebutton"
+        app:layout_constraintTop_toBottomOf="@+id/birthdate_signup_textinput"/>
 
     <Button
         android:id="@+id/signup_button"
         style="@style/marginBottomPosition"
-        android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/button_background_selector"
         android:text="@string/singup_button"
+        android:textAllCaps="false"
+        android:textColor="@color/button_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password_signup_textinput"/>
+        app:layout_constraintTop_toBottomOf="@+id/pick_doctor_singup_togglebutton"
+        app:layout_constraintVertical_bias="1.0"/>
 
     <ProgressBar
         android:id="@+id/progressBar_signup"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

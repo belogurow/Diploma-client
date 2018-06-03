@@ -1,4 +1,4 @@
-package ru.belogurow.socialnetworkclient.users.dto;
+package ru.belogurow.socialnetworkclient.users.model;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -8,29 +8,17 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
-import ru.belogurow.socialnetworkclient.chat.dto.FileEntityDto;
-import ru.belogurow.socialnetworkclient.users.model.UserProfileRole;
+public class UserProfile implements Serializable{
 
-public class UserProfileDto implements Serializable {
     private UUID id;
     private String profession;
-    private String description;
     private UUID userId;
+    private UUID avatarFileId;
+    private String description;
     private Date birthDate;
     private UserProfileRole role;
-    private FileEntityDto avatarFile;
 
-    public UserProfileDto() {
-    }
-
-    public UserProfileDto(UUID id, String profession, String description, UUID userId, Date birthDate, UserProfileRole role, FileEntityDto avatarFile) {
-        this.id = id;
-        this.profession = profession;
-        this.description = description;
-        this.userId = userId;
-        this.birthDate = birthDate;
-        this.role = role;
-        this.avatarFile = avatarFile;
+    public UserProfile() {
     }
 
     public UserProfileRole getRole() {
@@ -39,22 +27,6 @@ public class UserProfileDto implements Serializable {
 
     public void setRole(UserProfileRole role) {
         this.role = role;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Date getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(Date birthDate) {
-        this.birthDate = birthDate;
     }
 
     public UUID getId() {
@@ -81,12 +53,28 @@ public class UserProfileDto implements Serializable {
         this.userId = userId;
     }
 
-    public FileEntityDto getAvatarFile() {
-        return avatarFile;
+    public UUID getAvatarFileId() {
+        return avatarFileId;
     }
 
-    public void setAvatarFile(FileEntityDto avatarFile) {
-        this.avatarFile = avatarFile;
+    public void setAvatarFileId(UUID avatarFileId) {
+        this.avatarFileId = avatarFileId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
     }
 
     @Override
@@ -94,11 +82,11 @@ public class UserProfileDto implements Serializable {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .append("profession", profession)
-                .append("description", description)
                 .append("userId", userId)
+                .append("avatarFileId", avatarFileId)
+                .append("description", description)
                 .append("birthDate", birthDate)
                 .append("role", role)
-                .append("avatarFile", avatarFile)
                 .toString();
     }
 
@@ -108,16 +96,16 @@ public class UserProfileDto implements Serializable {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        UserProfileDto that = (UserProfileDto) o;
+        UserProfile that = (UserProfile) o;
 
         return new EqualsBuilder()
                 .append(id, that.id)
                 .append(profession, that.profession)
-                .append(description, that.description)
                 .append(userId, that.userId)
+                .append(avatarFileId, that.avatarFileId)
+                .append(description, that.description)
                 .append(birthDate, that.birthDate)
                 .append(role, that.role)
-                .append(avatarFile, that.avatarFile)
                 .isEquals();
     }
 
@@ -126,11 +114,11 @@ public class UserProfileDto implements Serializable {
         return new HashCodeBuilder(17, 37)
                 .append(id)
                 .append(profession)
-                .append(description)
                 .append(userId)
+                .append(avatarFileId)
+                .append(description)
                 .append(birthDate)
                 .append(role)
-                .append(avatarFile)
                 .toHashCode();
     }
 }

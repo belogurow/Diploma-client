@@ -122,7 +122,7 @@ public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHold
         if (avatarFile.getFileType().equals(FileType.JPG)) {
             GlideApp.with(mContext)
                     .load(App.BASE_URL + avatarFile.getDataUrl())
-                    .fitCenter()
+//                    .fitCenter()
                     .transition(DrawableTransitionOptions.withCrossFade())
 //                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                     .signature(new ObjectKey(avatarFile.getDataUrl()))

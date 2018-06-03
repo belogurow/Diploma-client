@@ -29,6 +29,7 @@ import ru.belogurow.socialnetworkclient.chat.model.FileType;
 import ru.belogurow.socialnetworkclient.common.extra.Extras;
 import ru.belogurow.socialnetworkclient.common.web.GlideApp;
 import ru.belogurow.socialnetworkclient.users.dto.UserDto;
+import ru.belogurow.socialnetworkclient.users.dto.UserProfileDto;
 import ru.belogurow.socialnetworkclient.users.model.FavoriteUsers;
 import ru.belogurow.socialnetworkclient.users.viewModel.FavoriteUsersViewModel;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
@@ -46,6 +47,10 @@ public class AboutUserActivity extends AppCompatActivity {
     private Button mStartDialogButton;
     private ToggleButton mFavUserToggleButton;
     private Toolbar mToolbar;
+
+    private TextView mRoleTextView;
+    private TextView mProfessionTextView;
+    private TextView mDescriptionTextView;
 
     private Drawable defaultUserIcon;
     private Drawable starIcon;
@@ -149,9 +154,29 @@ public class AboutUserActivity extends AppCompatActivity {
                     mFullnameTextView.setText(showedUser.getName());
                     mUsernameTextView.setText(showedUser.getUsername());
 
-                    // Set avatar image
-                    if (showedUser.getUserProfile() != null && showedUser.getUserProfile().getAvatarFile() != null) {
-                        setImageWithGlide(showedUser.getUserProfile().getAvatarFile());
+                    UserProfileDto showedUserProfile = showedUser.getUserProfile();
+
+                    if (showedUserProfile != null) {
+                        mRoleTextView.setText(showedUserProfile.getRole().toString());
+
+                        if (showedUserProfile.getDescription() == null) {
+                            mDescriptionTextView.setVisibility(View.GONE);
+                        } else {
+                            mDescriptionTextView.setVisibility(View.VISIBLE);
+                            mDescriptionTextView.setText(showedUserProfile.getDescription());
+                        }
+
+                        if (showedUserProfile.getProfession() == null) {
+                            mProfessionTextView.setVisibility(View.GONE);
+                        } else {
+                            mDescriptionTextView.setVisibility(View.VISIBLE);
+                            mDescriptionTextView.setText(showedUserProfile.getProfession());
+                        }
+
+                        if (showedUserProfile.getAvatarFile() != null) {
+                            // Set avatar image
+                            setImageWithGlide(showedUser.getUserProfile().getAvatarFile());
+                        }
                     }
 
                     break;
@@ -264,6 +289,11 @@ public class AboutUserActivity extends AppCompatActivity {
         mAddFriendButton.setEnabled(false);
         mStartDialogButton = findViewById(R.id.button_start_dialog_act_about_user);
         mStartDialogButton.setEnabled(false);
+
+        View itemUserProfileView = findViewById(R.id.act_about_user_include_layout);
+        mRoleTextView = itemUserProfileView.findViewById(R.id.item_user_profile_role_text);
+        mDescriptionTextView = itemUserProfileView.findViewById(R.id.item_user_profile_description_text);
+        mProfessionTextView = itemUserProfileView.findViewById(R.id.item_user_profile_profession_text);
 
         mToolbar = findViewById(R.id.toolbar_act_about_user);
         setSupportActionBar(mToolbar);

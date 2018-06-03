@@ -100,7 +100,7 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.View
     private void setImageWithGlide(FileEntityDto avatarFile, ViewHolder viewHolder) {
         GlideApp.with(mContext)
                 .load(App.BASE_URL + avatarFile.getDataUrl())
-                .fitCenter()
+//                .fitCenter()
                 .transition(DrawableTransitionOptions.withCrossFade())
 //                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .signature(new ObjectKey(avatarFile.getDataUrl()))

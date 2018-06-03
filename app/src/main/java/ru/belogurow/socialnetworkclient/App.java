@@ -16,6 +16,7 @@ import ru.belogurow.socialnetworkclient.di.AppModule;
 import ru.belogurow.socialnetworkclient.di.DaggerAppComponent;
 import ru.belogurow.socialnetworkclient.di.DatabaseModule;
 import ru.belogurow.socialnetworkclient.users.service.FavoriteUsersWebService;
+import ru.belogurow.socialnetworkclient.users.service.UserProfileWebService;
 import ru.belogurow.socialnetworkclient.users.service.UserWebService;
 import ru.belogurow.socialnetworkclient.web.SelfSigningClientBuilder;
 
@@ -37,6 +38,7 @@ public class App extends Application {
     public static ChatWebService sChatWebService;
     public static FileWebService sFileWebService;
     public static FavoriteUsersWebService sFavoriteUsersWebService;
+    public static UserProfileWebService sProfileWebService;
 
     @Override
     public void onCreate() {
@@ -63,6 +65,7 @@ public class App extends Application {
         sChatWebService = retrofit.create(ChatWebService.class);
         sFileWebService = retrofit.create(FileWebService.class);
         sFavoriteUsersWebService = retrofit.create(FavoriteUsersWebService.class);
+        sProfileWebService = retrofit.create(UserProfileWebService.class);
     }
 
     private void initDagger() {

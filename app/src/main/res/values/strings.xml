@@ -52,5 +52,12 @@
     <string name="pick_from_phone_storage">Pick from phone storage</string>
     <string name="file_size_10MB">File size exceeds 10MB</string>
     <string name="favorite_users">Favorite users</string>
+    <string name="pick">Pick</string>
+    <string name="doctor">Doctor</string>
+    <string name="patient">Patient</string>
+    <string name="description">Description</string>
+    <string name="birth_date">Birth date</string>
+    <string name="profession">Profession</string>
+    <string name="date_formatter">%1$d/%2$d/%3$d</string>
 
 </resources>

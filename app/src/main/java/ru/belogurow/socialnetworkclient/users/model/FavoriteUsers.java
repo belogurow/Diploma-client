@@ -4,9 +4,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class FavoriteUsers {
+public class FavoriteUsers implements Serializable{
 
     private UUID id;
     private UUID fromUserId;

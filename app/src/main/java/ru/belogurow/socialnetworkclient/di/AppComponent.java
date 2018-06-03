@@ -12,13 +12,15 @@ import ru.belogurow.socialnetworkclient.chat.viewModel.FileViewModel;
 import ru.belogurow.socialnetworkclient.users.dao.UserDao;
 import ru.belogurow.socialnetworkclient.users.repository.LocalUserRepository;
 import ru.belogurow.socialnetworkclient.users.repository.RemoteFavoriteUsersRepository;
+import ru.belogurow.socialnetworkclient.users.repository.RemoteUserProfileRepository;
 import ru.belogurow.socialnetworkclient.users.repository.RemoteUserRepository;
 import ru.belogurow.socialnetworkclient.users.viewModel.FavoriteUsersViewModel;
+import ru.belogurow.socialnetworkclient.users.viewModel.UserProfileViewModel;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 
 
 @Singleton
-@Component(modules = {AppModule.class, ChatModule.class, FileModule.class, UserModule.class, DatabaseModule.class})
+@Component(modules = {AppModule.class, ChatModule.class, FileModule.class, UserModule.class, DatabaseModule.class, UserProfileModule.class})
 public interface AppComponent {
 
     RemoteUserRepository getRemoteUserRepository();
@@ -30,6 +32,8 @@ public interface AppComponent {
     RemoteFileRepository getRemoteFileRepository();
 
     RemoteFavoriteUsersRepository getRemoteFavoriteUsersRepository();
+
+    RemoteUserProfileRepository getRemoteUserProfileRepository();
 
     AppDatabase getAppDatabase();
 
@@ -48,6 +52,8 @@ public interface AppComponent {
     void inject(FileViewModel fileViewModel);
 
     void inject(FavoriteUsersViewModel favoriteUsersViewModel);
+
+    void inject(UserProfileViewModel userProfileViewModel);
 
     void inject(App app);
 

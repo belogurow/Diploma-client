@@ -36,6 +36,7 @@ import ru.belogurow.socialnetworkclient.common.web.GlideApp;
 import ru.belogurow.socialnetworkclient.common.web.NetworkStatus;
 import ru.belogurow.socialnetworkclient.ui.activity.LoginActivity;
 import ru.belogurow.socialnetworkclient.users.dto.UserDto;
+import ru.belogurow.socialnetworkclient.users.dto.UserProfileDto;
 import ru.belogurow.socialnetworkclient.users.viewModel.UserViewModel;
 
 public class FragmentMyProfile extends Fragment {
@@ -52,6 +53,10 @@ public class FragmentMyProfile extends Fragment {
     private ProgressBar mProgressBar;
     private Button mLogOutButton;
     private Drawable defaultIcon;
+
+    private TextView mRoleTextView;
+    private TextView mProfessionTextView;
+    private TextView mDescriptionTextView;
 
     private UserDto currentUser;
 
@@ -94,6 +99,11 @@ public class FragmentMyProfile extends Fragment {
         mLogOutButton = view.findViewById(R.id.frag_user_profile_logout_button);
         mProgressBar = view.findViewById(R.id.frag_user_profile_progress);
 
+        View itemUserProfileView = view.findViewById(R.id.frag_my_profile_include_layout);
+        mRoleTextView = itemUserProfileView.findViewById(R.id.item_user_profile_role_text);
+        mDescriptionTextView = itemUserProfileView.findViewById(R.id.item_user_profile_description_text);
+        mProfessionTextView = itemUserProfileView.findViewById(R.id.item_user_profile_profession_text);
+
         defaultIcon = new IconicsDrawable(view.getContext())
                 .icon(FontAwesome.Icon.faw_user_circle2)
                 .color(view.getResources().getColor(R.color.md_grey_500))
@@ -131,9 +141,29 @@ public class FragmentMyProfile extends Fragment {
                             mFullnameTextView.setText(currentUser.getName());
                             mUsernameTextView.setText(currentUser.getUsername());
 
-                            // Set avatar image
-                            if (currentUser.getUserProfile() != null && currentUser.getUserProfile().getAvatarFile() != null) {
-                                setImageWithGlide(currentUser.getUserProfile().getAvatarFile());
+                            UserProfileDto showedUserProfile = currentUser.getUserProfile();
+
+                            if (showedUserProfile != null) {
+                                mRoleTextView.setText(showedUserProfile.getRole().toString());
+
+                                if (showedUserProfile.getDescription() == null) {
+                                    mDescriptionTextView.setVisibility(View.GONE);
+                                } else {
+                                    mDescriptionTextView.setVisibility(View.VISIBLE);
+                                    mDescriptionTextView.setText(showedUserProfile.getDescription());
+                                }
+
+                                if (showedUserProfile.getProfession() == null) {
+                                    mProfessionTextView.setVisibility(View.GONE);
+                                } else {
+                                    mDescriptionTextView.setVisibility(View.VISIBLE);
+                                    mDescriptionTextView.setText(showedUserProfile.getProfession());
+                                }
+
+                                if (showedUserProfile.getAvatarFile() != null) {
+                                    // Set avatar image
+                                    setImageWithGlide(currentUser.getUserProfile().getAvatarFile());
+                                }
                             }
                             break;
                         case ERROR:
@@ -206,11 +236,11 @@ public class FragmentMyProfile extends Fragment {
     private void setImageWithGlide(FileEntityDto avatarFile) {
         GlideApp.with(this)
                 .load(App.BASE_URL + avatarFile.getDataUrl())
-                .fitCenter()
+//                .fitCenter()
                 .transition(DrawableTransitionOptions.withCrossFade())
 //                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .signature(new ObjectKey(avatarFile.getDataUrl()))
-//                .error(defaultIcon)
+                .error(defaultIcon)
                 .into(mUserAvatarImageView);
     }
 

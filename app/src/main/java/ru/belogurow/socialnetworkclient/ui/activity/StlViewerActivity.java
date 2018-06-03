@@ -1,9 +1,11 @@
 package ru.belogurow.socialnetworkclient.ui.activity;
 
 import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -38,6 +40,7 @@ public class StlViewerActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private Toolbar mToolbar;
 
+    private FileEntityDto fileEntityDto;
     private File stlFile;
 
     @Override
@@ -46,40 +49,13 @@ public class StlViewerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_stl_viewer);
 
         if (getIntent().hasExtra(Extras.EXTRA_FILE_ENTITY_DTO)) {
-            FileEntityDto fileEntityDto = (FileEntityDto) getIntent().getSerializableExtra(Extras.EXTRA_FILE_ENTITY_DTO);
+            fileEntityDto = (FileEntityDto) getIntent().getSerializableExtra(Extras.EXTRA_FILE_ENTITY_DTO);
 
             initFields(fileEntityDto);
             askPermissions();
 
-            // Show stl model in web view
-            Call<ResponseBody> call = App.sFileWebService.getFileById(fileEntityDto.getId());
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    if (response.isSuccessful()) {
-                        try {
+            loadStl();
 
-                            File path = Environment.getExternalStorageDirectory();
-                            stlFile = new File(path, fileEntityDto.getTitle() + fileEntityDto.getFileType().toString().toLowerCase());
-                            FileOutputStream fileOutputStream = new FileOutputStream(stlFile);
-                            IOUtils.write(response.body().bytes(), fileOutputStream);
-
-                            showWebView(stlFile.getAbsolutePath());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            hideProgressBar();
-                        }
-                    } else {
-                        hideProgressBar();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Toast.makeText(StlViewerActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                    hideProgressBar();
-                }
-            });
         } else {
             Toast.makeText(this, "Receive null data from previous activity, retry.", Toast.LENGTH_SHORT).show();
         }
@@ -121,7 +97,37 @@ public class StlViewerActivity extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_PERMISSIONS);
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_PERMISSIONS);
         }
+    }
 
+    private void loadStl() {
+        // Show stl model in web view
+        Call<ResponseBody> call = App.sFileWebService.getFileById(fileEntityDto.getId());
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    try {
+                        File path = Environment.getExternalStorageDirectory();
+                        stlFile = new File(path, fileEntityDto.getTitle() + fileEntityDto.getFileType().toString().toLowerCase());
+                        FileOutputStream fileOutputStream = new FileOutputStream(stlFile);
+                        IOUtils.write(response.body().bytes(), fileOutputStream);
+
+                        showWebView(stlFile.getAbsolutePath());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        hideProgressBar();
+                    }
+                } else {
+                    hideProgressBar();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(StlViewerActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                hideProgressBar();
+            }
+        });
     }
 
     private void showProgressBar() {
@@ -141,6 +147,19 @@ public class StlViewerActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    loadStl();
+                }
+                break;
+        }
+
     }
 
     @Override
