@@ -1,11 +1,52 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+    </style>
+    
+    <style name="marginTopPosition">
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginLeft">8dp</item>
+        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+    
+    <style name="marginCenterPosition">
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:layout_marginLeft">8dp</item>
+        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+    <style name="marginBottomPosition">
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:layout_marginLeft">8dp</item>
+        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+
+    <style name="TextTitle">
+        <item name="android:color">@android:color/black</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextSubTitle">
+        <item name="android:color">@android:color/darker_gray</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="ChatMessageText" parent="marginCenterPosition">
+        <item name="android:color">@color/md_black_1000</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="ChatMessageDate" parent="marginCenterPosition">
+        <item name="android:color">@color/md_dark_dividers</item>
+        <item name="android:textSize">10sp</item>
     </style>
 
 </resources>

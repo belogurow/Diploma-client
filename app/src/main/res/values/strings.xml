@@ -1,3 +1,63 @@
 <resources>
     <string name="app_name">Social network client</string>
+
+    <!-- Login activity -->
+    <string name="login_hint">Login</string>
+    <string name="password_hint">Password</string>
+    <string name="login_button">Log in</string>
+    <string name="sign_up_button">Sign up</string>
+
+    <!-- Common -->
+    <string name="empty_field">Empty filed</string>
+    <string name="else_field">Else</string>
+
+    <!-- SignUp Activity-->
+    <string name="login_signup">Login</string>
+    <string name="fullname_signup">Fullname</string>
+    <string name="password">Password</string>
+    <string name="singup_button">Sing up</string>
+    <string name="test_textView">Test</string>
+
+    <!-- AboutUser Activity -->
+    <string name="title_about_user">About user</string>
+
+    <!-- Navigation Drawer -->
+    <string name="my_profile">My profile</string>
+    <string name="users">Users</string>
+
+    <!-- MyProfile Fragment -->
+    <string name="log_out_button">Log out</string>
+    <string name="send_button">Send</string>
+    <string name="message">Message</string>
+    <string name="dialogs">Dialogs</string>
+    <string name="button_add_friend">Add friend</string>
+    <string name="button_start_dialog">Start dialog</string>
+    <string name="you">You: %1$s</string>
+    <string name="pick_photo_for_avatar">Pick photo for avatar</string>
+    <string name="received_null_data">Received null data</string>
+    <string name="list_is_empty">List is empty</string>
+    <string name="unknown_status">Unknown status</string>
+    <string name="my_files">Files</string>
+    <string name="pick_file">Pick file</string>
+    <string name="cannot_pick_file">Cannot pick file</string>
+    <string name="successful_upload">Successful</string>
+    <string name="upload">Upload</string>
+    <string name="title">Title</string>
+    <string name="upload_file">Upload file</string>
+    <string name="dialog_file_upload_title">File successfully uploaded</string>
+    <string name="dialog_file_upload_message">Add a new one?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="pick_from_my_files">Pick from my files</string>
+    <string name="pick_from_phone_storage">Pick from phone storage</string>
+    <string name="file_size_10MB">File size exceeds 10MB</string>
+    <string name="favorite_users">Favorite users</string>
+    <string name="pick">Pick</string>
+    <string name="doctor">Doctor</string>
+    <string name="patient">Patient</string>
+    <string name="description">Description</string>
+    <string name="birth_date">Birth date</string>
+    <string name="profession">Profession</string>
+    <string name="date_formatter">%1$d/%2$d/%3$d</string>
+
 </resources>
