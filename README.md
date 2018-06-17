@@ -5,7 +5,7 @@ The Android application of my graduation project - Social medical network **"Con
 See this [link](https://github.com/belogurow/Diploma-server) for back-end project on Spring Boot 2.0 of this social medical network.
 
 ## Building the project
-Clone this repository and configure URL address in ``App.java`` file of your server:
+Clone this repository and configure URL address of your server in ``App.java`` file:
 ```java
 private static final String URL = "10.0.2.2:8090";
 ```
