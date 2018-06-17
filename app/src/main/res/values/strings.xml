@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Social network client</string>
+    <string name="app_name">Consilium</string>
 
     <!-- Login activity -->
     <string name="login_hint">Login</string>
@@ -9,7 +9,7 @@
 
     <!-- Common -->
     <string name="empty_field">Empty filed</string>
-    <string name="else_field">Else</string>
+    <string name="else_field" translatable="false">Else</string>
 
     <!-- SignUp Activity-->
     <string name="login_signup">Login</string>
