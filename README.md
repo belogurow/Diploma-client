@@ -21,3 +21,6 @@ Run.
 * Languages:
     * English
     * Russian
+
+## Screenshots
+![Login page](/screenshots/login)
