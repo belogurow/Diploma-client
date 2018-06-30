@@ -23,4 +23,4 @@ Run.
     * Russian
 
 ## Screenshots
-![Login page](/screenshots/login)
+![Login page](screenshots/login)
