@@ -26,6 +26,6 @@ Run.
 ![Login page](screenshots/login.png)
 ![Navigation](screenshots/navigation.png)
 ![Users](screenshots/users.png)
-
 ![Chat room](screenshots/chat_room.png)
 ![Files](screenshots/files.png)
+![File upload](screenshots/file_upload.png)
