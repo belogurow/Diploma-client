@@ -23,4 +23,9 @@ Run.
     * Russian
 
 ## Screenshots
-![Login page](screenshots/login)
+![Login page](screenshots/login.png)
+![Navigation](screenshots/navigation.png)
+![Users](screenshots/users.png)
+
+![Chat room](screenshots/chat_room.png)
+![Files](screenshots/files.png)
